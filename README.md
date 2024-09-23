@@ -1,1 +1,0 @@
-# netology_homework
