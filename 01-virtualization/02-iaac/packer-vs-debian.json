@@ -1,0 +1,33 @@
+{
+    "builders": [
+        {
+            "type": "yandex",
+            "token": "y0_**************************",
+            "folder_id": "b1gfoipitiot0c1fe5ln",
+            "zone": "ru-central1-a",
+            "image_name": "vs-images-debian-11-docker",
+            "image_description": "VS Images. Dedian 11 with docker, htop and tmux.",
+            "source_image_family": "debian-11",
+            "subnet_id": "e9bi06dhc2efp1fa97ee",
+            "use_ipv4_nat": true,
+            "disk_type": "network-hdd",
+            "ssh_username": "debian"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sudo apt-get update",
+                "sudo apt-get install -y ca-certificates curl",
+                "sudo install -m 0755 -d /etc/apt/keyrings",
+                "sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc",
+                "sudo chmod a+r /etc/apt/keyrings/docker.asc",
+                "echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
+                "sudo apt-get update",
+                "sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
+                "sudo apt-get install -y htop tmux"
+            ]
+        }
+    ]
+}
