@@ -20,7 +20,7 @@
 
 #### Пункт 5
 
-[Отчет сканирования образа](https://github.com/cachmc/netology_devops_homework/raw/main/01-virtualization/05-docker-in-practice/vulnerabilities_image_web_app_py.csv)
+[Отчет сканирования образа](https://github.com/cachmc/netology_devops_homework/blob/main/01-virtualization/05-docker-in-practice/vulnerabilities_image_web_app_py.csv)
 
 
 
@@ -151,7 +151,7 @@ docker run \
 
 
 
-## Задача 6.1
+## Задача 6.2
 
 ![Скриншот 11](https://github.com/cachmc/netology_devops_homework/raw/main/01-virtualization/05-docker-in-practice/pictures/task-6-4.png)
 
