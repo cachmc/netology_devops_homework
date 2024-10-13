@@ -111,7 +111,7 @@ cat terraform.tfstate
 ## Задача 2
 
 Создание ВМ в Yandex Cloud
-```json
+```t
 terraform {
   required_providers {
     yandex = {
@@ -263,7 +263,7 @@ resource "yandex_compute_instance" "netology-docker" {
 <br>
 
 Запуск контейнера MySQL
-```json
+```t
 terraform {
   required_providers {
     docker = {
