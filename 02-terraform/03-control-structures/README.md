@@ -8,7 +8,7 @@
 
 ## Задача 4
 
-![Скриншот 2](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-2.png)
+![Скриншот 2](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-4.png)
 
 
 
