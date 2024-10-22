@@ -1,0 +1,33 @@
+# The function is used to permanently change the checksum of file. DON'T DELETE!
+# ${timestamp()}
+
+[webservers]
+%{~ for i in vm_web~}
+
+${i["name"]}		ansible_host=${i["network_interface"][0]["nat_ip_address"] != "" ? i["network_interface"][0]["nat_ip_address"] : i["network_interface"][0]["ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+
+
+[webservers:vars]
+ansible_ssh_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+
+
+[databases]
+%{~ for i in vm_db~}
+
+${i["name"]}		ansible_host=${i["network_interface"][0]["nat_ip_address"] != "" ? i["network_interface"][0]["nat_ip_address"] : i["network_interface"][0]["ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+
+
+[databases:vars]
+ansible_ssh_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+
+
+[storages]
+${vm_storage["name"]}		ansible_host=${vm_storage["network_interface"][0]["nat_ip_address"] != "" ? vm_storage["network_interface"][0]["nat_ip_address"] : vm_storage["network_interface"][0]["ip_address"]} fqdn=${vm_storage["fqdn"]}
+
+[storages:vars]
+ansible_ssh_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
