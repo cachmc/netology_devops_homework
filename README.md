@@ -2,13 +2,13 @@
 
 ## Задача 1
 
-![Скриншот 1](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-1.png)
+![Скриншот 1](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-1.png)
 
 
 
 ## Задача 4
 
-![Скриншот 2](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-4.png)
+![Скриншот 2](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-4.png)
 
 
 
@@ -20,7 +20,7 @@
 
 Поэтому в *locals.tf* предварительно я объединил списки из двух переменных и в *output* вывел результирующую.
 
-![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-5.png)
+![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-5.png)
 
 
 
@@ -43,13 +43,13 @@
 
 P.S. *depends_on* в *local_file* не дал ни какого результата.
 
-![Скриншот 4](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-6-1.png)
+![Скриншот 4](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-6-1.png)
 
-![Скриншот 5](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-6-2.png)
+![Скриншот 5](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-6-2.png)
 
-![Скриншот 6](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-6-3.png)
+![Скриншот 6](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-6-3.png)
 
-![Скриншот 7](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/03-control-structures/pictures/task-6-4.png)
+![Скриншот 7](https://github.com/cachmc/netology_devops_homework/raw/terraform-03/pictures/task-6-4.png)
 
 
 
@@ -83,4 +83,4 @@ ${i["name"]} ansible_host=${i["network_interface"][0]["nat_ip_address"]} platfor
 %{~ endfor ~}
 ```
 
-# [Terraform Code](https://github.com/cachmc/netology_devops_homework/tree/main/02-terraform/03-control-structures/src)
+# [Terraform Code](https://github.com/cachmc/netology_devops_homework/tree/terraform-03/src)
