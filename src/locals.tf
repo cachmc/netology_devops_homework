@@ -1,10 +1,6 @@
 locals {
   ssh-keys = file("~/.ssh/id_ed25519.pub")
 
-  #For task 5
-  list_vm_db = [ for vm_db in yandex_compute_instance.create_vm_db: vm_db ] 
-  list_vm_for_output = setunion(local.list_vm_db, yandex_compute_instance.create_vm_web)
-
   #For task 7
   vpc = {
     "network_id" = "enp7i560tb28nageq0cc"
@@ -22,5 +18,3 @@ locals {
     ]
   }
 }
-
-

@@ -8,7 +8,7 @@ resource "local_file" "hosts_templatefile" {
   content = templatefile("${path.module}/hosts.tftpl", {
     vm_web = yandex_compute_instance.create_vm_web
     vm_db = yandex_compute_instance.create_vm_db
-    vm_storage = yandex_compute_instance.create_vm_storage
+    vm_storage = [ yandex_compute_instance.create_vm_storage ]
   })
 
   filename = "${abspath(path.module)}/hosts.ini"
