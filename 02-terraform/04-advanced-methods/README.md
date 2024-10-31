@@ -162,7 +162,7 @@ terraform plan
 <br>
 <br>
 
-## Задача 
+## Задача 8
 
 ![Скриншот 36](https://github.com/cachmc/netology_devops_homework/raw/main/02-terraform/04-advanced-methods/pictures/task-8-1.png)
 
