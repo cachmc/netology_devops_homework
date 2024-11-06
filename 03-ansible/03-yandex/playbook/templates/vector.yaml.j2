@@ -1,0 +1,16 @@
+sources:
+  random_log:
+    type: "demo_logs"
+    format: "apache_common"
+    lines: 
+      - "line1"
+
+sinks:
+  pull_to_clickhouse:
+    type: "clickhouse"
+    inputs:
+      - "random_log"
+    endpoint: "http://{{ hostvars[groups['clickhouse'][0]].ansible_host }}:8123"
+    database: "{{ clickhouse_db_name }}"
+    table: "{{ clickhouse_table_name }}"
+    skip_unknown_fields: true
