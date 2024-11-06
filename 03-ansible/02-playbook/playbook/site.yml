@@ -1,0 +1,184 @@
+---
+- name: Install Clickhouse
+  tags: clickhouse
+  hosts: clickhouse
+
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.systemd:
+        name: clickhouse-server
+        state: restarted
+
+  tasks:
+    - name: Selecting package versions for architecture OS
+      block:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com\
+                 /rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
+            dest: "/tmp/{{ item }}-{{ clickhouse_version }}.rpm"
+            mode: "0644"
+          with_items: "{{ clickhouse_packages }}"
+      rescue:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com\
+                 /rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
+            dest: "/tmp/clickhouse-common-static-{{ clickhouse_version }}.rpm"
+            mode: "0644"
+
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.yum:
+        name:
+          - /tmp/clickhouse-common-static-{{ clickhouse_version }}.rpm
+          - /tmp/clickhouse-client-{{ clickhouse_version }}.rpm
+          - /tmp/clickhouse-server-{{ clickhouse_version }}.rpm
+        disable_gpg_check: true
+      notify: Start clickhouse service
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable clickhouse service
+      become: true
+      ansible.builtin.systemd:
+        name: clickhouse-server
+        enabled: true
+
+    - name: Wait to opened for port 9000
+      ansible.builtin.wait_for:
+        port: 9000
+        delay: 10
+
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'CREATE DATABASE IF NOT EXISTS {{ clickhouse_db_name }};'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82
+      changed_when: create_db.rc == 0
+
+    - name: Create table
+      ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS {{ clickhouse_db_name }}.random_log\
+                               (message String) ENGINE = MergeTree() ORDER BY tuple();'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82
+      changed_when: create_db.rc == 0
+
+
+- name: Install Vector
+  tags: vector
+  hosts: vector
+
+  handlers:
+    - name: Systemd daemon reload
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Start vector service
+      become: true
+      ansible.builtin.systemd:
+        name: vector
+        state: restarted
+
+  tasks:
+#    - name: Get vector distrib
+#      ansible.builtin.get_url:
+#        url: "https://yum.vector.dev/stable/vector-0/x86_64/\
+#             vector-{{ vector_version }}-1.x86_64.rpm"
+#        dest: "/tmp/vector-{{ vector_version }}-1.x86_64.rpm"
+#        mode: "0644"
+
+#    - name: Install vector packages
+#      become: true
+#      ansible.builtin.yum:
+#        name: /tmp/vector-{{ vector_version }}-1.x86_64.rpm
+#      notify: Start start service
+
+#    - name: Copy config file vector.yaml
+#      become: true
+#      ansible.builtin.template:
+#        src: "vector.yaml.j2"
+#        dest: "/etc/vector/vector.yaml"
+#        mode: "0644"
+#        backup: true
+#      notify: Start vector service
+
+    - name: Get vector distrib
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/vector/{{ vector_version }}\
+             /vector-{{ vector_version }}-x86_64-unknown-linux-musl.tar.gz"
+        dest: "/tmp/vector-{{ vector_version }}-x86_64-unknown-linux-musl.tar.gz"
+        mode: "0644"
+
+    - name: Extract archive
+      ansible.builtin.unarchive:
+        src: "/tmp/vector-{{ vector_version }}-x86_64-unknown-linux-musl.tar.gz"
+        dest: "/tmp"
+        remote_src: true
+
+    - name: Create group vector
+      become: true
+      ansible.builtin.group:
+        name: vector
+
+    - name: Create user vector
+      become: true
+      ansible.builtin.user:
+        name: vector
+        group: vector
+        expires: -1
+        create_home: false
+
+    - name: Cretate directories
+      become: true
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: "{{ item.mode }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+      with_items:
+        - { path: '/etc/vector', owner: "root", group: "root", mode: '0775' }
+        - { path: '/var/lib/vector', owner: "vector", group: "vector", mode: '0755' }
+
+    - name: Copy vector unit file
+      become: true
+      ansible.builtin.copy:
+        src: "/tmp/vector-x86_64-unknown-linux-musl/etc/systemd/vector.service"
+        dest: "/usr/lib/systemd/system/"
+        mode: "0664"
+        remote_src: true
+      notify: Systemd daemon reload
+
+    - name: Copy vector files
+      become: true
+      ansible.builtin.copy:
+        src: "/tmp/vector-x86_64-unknown-linux-musl/{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+        backup: true
+        remote_src: true
+      with_items:
+        - { src: 'bin/vector', dest: '/usr/bin/vector', mode: '0775' }
+        - { src: 'etc/systemd/vector.default', dest: '/etc/default/vector', mode: '0664' }
+      notify: Start vector service
+
+    - name: Copy config file vector.yaml
+      become: true
+      ansible.builtin.template:
+        src: 'vector.yaml.j2'
+        dest: '/etc/vector/vector.yaml'
+        mode: '0644'
+        backup: true
+      notify: Start vector service
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable vector service
+      become: true
+      ansible.builtin.systemd:
+        name: vector
+        enabled: true
