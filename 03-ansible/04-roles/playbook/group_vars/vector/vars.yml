@@ -1,0 +1,6 @@
+vector_ch_address: 89.169.138.235
+vector_ch_user: "vector"
+vector_ch_password: "vector"
+
+vector_ch_db_name: "logs"
+vector_ch_table_name: "random_log"

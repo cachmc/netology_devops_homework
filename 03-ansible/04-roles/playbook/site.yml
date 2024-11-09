@@ -1,0 +1,73 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+
+  roles:
+    - role: clickhouse
+
+  post_tasks:
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS {{ item.name }}.{{ clickhouse_table_name }} \
+                               (message String) ENGINE = MergeTree() ORDER BY tuple();'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82
+      changed_when: create_db.rc == 0
+      with_items: "{{ clickhouse_dbs_custom }}"
+
+
+- name: Install Vector
+  hosts: vector
+
+  roles:
+    - role: vector
+
+
+- name: Install LightHouse
+  hosts: lighthouse
+
+  handlers:
+    - name: Reload nginx service
+      become: true
+      ansible.builtin.command: "/usr/sbin/nginx -s reload"
+      register: reload_nginx
+      failed_when: reload_nginx.rc != 0
+      changed_when: reload_nginx.rc == 0
+      listen: nginx_reload
+
+    - name: Start nginx service
+      become: true
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+      listen: nginx_start
+
+  roles:
+    - role: lighthouse
+
+  post_tasks:
+    - name: Install nginx package
+      become: true
+      ansible.builtin.yum:
+        name: nginx
+      notify: nginx_start
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Copy config file nginx.conf
+      become: true
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "/etc/nginx/{{ item.dest }}"
+        mode: "{{ item.mode }}"
+        backup: true
+      with_items:
+        - { src: 'nginx.conf.j2', dest: 'nginx.conf', mode: '0644' }
+        - { src: 'nginx_lighthouse.conf.j2', dest: 'conf.d/lighthouse.conf', mode: '0644' }
+      notify: nginx_reload
+
+    - name: Enable nginx service
+      become: true
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true

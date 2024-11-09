@@ -1,0 +1,19 @@
+# The function is used to permanently change the checksum of file. DON'T DELETE!
+# 2024-11-09T16:25:16Z
+
+clickhouse:
+  hosts:
+    clickhouse-01:
+      ansible_host: 89.169.138.235
+
+
+lighthouse:
+  hosts:
+    lighthouse-01:
+      ansible_host: 89.169.155.7
+
+
+vector:
+  hosts:
+    vector-01:
+      ansible_host: 89.169.129.237
