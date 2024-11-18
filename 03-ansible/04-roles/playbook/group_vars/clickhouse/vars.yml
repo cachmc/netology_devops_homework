@@ -5,11 +5,11 @@ clickhouse_listen_host:
   - "::"
 
 clickhouse_profiles_custom:
- vector:
-   max_memory_usage: 10000000000
-   use_uncompressed_cache: 0
-   load_balancing: random
-   readonly: 0
+  vector:
+    max_memory_usage: 10000000000
+    use_uncompressed_cache: 0
+    load_balancing: random
+    readonly: 0
 
 clickhouse_users_custom:
   - { name: "lighthouse",
@@ -17,18 +17,18 @@ clickhouse_users_custom:
       networks: { "::/0" },
       profile: "default",
       quota: "default",
-      dbs: [ logs ] ,
+      dbs: [ logs ],
       comment: "User for LightHouse"}
   - { name: "vector",
       password: "vector",
       networks: { "::/0" },
       profile: "vector",
       quota: "default",
-      dbs: [ logs ] ,
+      dbs: [ logs ],
       comment: "User for Vector"}
 
 clickhouse_dbs_custom:
-      - { name: logs }
+  - { name: logs }
 
 clickhouse_table_name: "random_log"
 
