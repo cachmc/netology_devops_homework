@@ -1,0 +1,48 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Find config files                                                               
+      ansible.builtin.find:
+        paths: /etc/vector
+      register: find_configs
+
+    - name: Validate configs vector
+      ansible.builtin.command: vector validate
+      environment:
+        VECTOR_CONFIG_DIR: /etc/vector
+      register: validate_configs
+      failed_when:
+        - validate_configs is failed
+        - "'Failed to load' not in validate_configs.stdout"
+      when: find_configs.files | length > 0
+
+    - name: Check validate configs vector
+      ansible.builtin.debug:
+        var: validate_configs.stdout_lines
+      failed_when: '"Validated" not in validate_configs.stdout'
+      when: find_configs.files | length > 0
+
+    - name: Get state vector.service
+      ansible.builtin.service_facts:
+
+    - name: Check vector.service
+      ansible.builtin.debug:
+        msg: "vector.service has state '{{ ansible_facts.services[\"vector.service\"][\"state\"] }}'"
+      failed_when: '"failed" in ansible_facts.services["vector.service"]["state"]'
+
+    - name: Check enabled vector.service
+      ansible.builtin.debug:
+        msg: "vector.service has status '{{ ansible_facts.services[\"vector.service\"][\"status\"] }}'"
+      failed_when: '"enabled" not in ansible_facts.services["vector.service"]["status"]'
+      when: '"running" in ansible_facts.services["vector.service"]["state"]'
+
+    - name: Check disabled vector.service
+      ansible.builtin.debug:
+        msg: "vector.service has status '{{ ansible_facts.services[\"vector.service\"][\"status\"] }}'"
+      failed_when: '"disabled" not in ansible_facts.services["vector.service"]["status"]'
+      when: '"running" not in ansible_facts.services["vector.service"]["state"]'    

@@ -1,0 +1,12 @@
+---
+- name: Install git package
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.yum:
+    name: git
+
+- name: Download git repository LightHouse
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.git:
+    repo: "https://github.com/VKCOM/lighthouse.git"
+    dest: "{{ lighthouse_install_path }}"
+    version: master

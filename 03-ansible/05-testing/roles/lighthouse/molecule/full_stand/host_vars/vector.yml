@@ -1,0 +1,10 @@
+---
+vector_version: "0.42.0"
+vector_ch_address: "10.10.50.11"
+vector_ch_user: "vector"
+vector_ch_password: "vector"
+vector_ch_port: "8123"
+vector_ch_db_name: "logs"
+vector_ch_table_name: "random_log"
+vector_configs_add:
+  clickhouse: "{{ lookup('template', './templates/clickhouse.yaml.j2') }}"

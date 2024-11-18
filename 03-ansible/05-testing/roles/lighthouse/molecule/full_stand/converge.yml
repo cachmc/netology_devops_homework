@@ -1,0 +1,119 @@
+---
+### ClickHouse
+- name: Install ClickHouse
+  hosts: clickhouse
+
+  vars:
+    ansible_pkg_mgr: "yum"
+
+  pre_tasks:
+    - name: Create group 'clickhouse'
+      become: true
+      ansible.builtin.group:
+        name: clickhouse
+        state: present
+
+    - name: Create user 'clickhouse'
+      become: true
+      ansible.builtin.user:
+        name: clickhouse
+        group: clickhouse
+        create_home: true
+        expires: -1
+
+    - name: Create directory '/run/clickhouse-server'
+      become: true
+      ansible.builtin.file:
+        name: /run/clickhouse-server
+        owner: clickhouse
+        group: clickhouse
+        state: directory
+
+  roles:
+    - role: clickhouse
+
+  post_tasks:
+    - name: Gather list of existing tables
+      ansible.builtin.command: "clickhouse-client -q 'SHOW TABLES FROM {{ item.name }};'"
+      changed_when: false
+      with_items: "{{ clickhouse_dbs_custom }}"
+      register: existing_tables
+
+    - name: Show existing tables
+      debug:
+        msg: |
+          {% for table in existing_tables.results %}
+          {% if item.name == table.item.name %}
+          {{ table.stdout_lines }}
+          {% endif %}
+          {% endfor %}
+      with_items: "{{ clickhouse_dbs_custom }}"
+
+    - name: Create table
+      ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS \
+                               {{ item.item.name }}.{{ clickhouse_table_name }} (message String) \
+                               ENGINE = MergeTree() ORDER BY tuple();'"
+      when: clickhouse_table_name not in item.stdout_lines
+      with_items: "{{ existing_tables.results }}"
+
+
+### Vector
+- name: Install Vector
+  hosts: vector
+
+  roles:
+    - role: vector
+
+
+### LightHouse
+- name: Install LightHouse
+  hosts: lighthouse
+
+  handlers:
+    - name: Reload nginx service
+      become: true
+      ansible.builtin.command: "/usr/sbin/nginx -s reload"
+      register: reload_nginx
+      failed_when: reload_nginx.rc != 0
+      changed_when: reload_nginx.rc == 0
+      listen: nginx_reload
+
+    - name: Start nginx service
+      become: true
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+      listen: nginx_start
+
+  tasks:
+    - name: "Include lighthouse"
+      include_role:
+        name: "lighthouse"
+
+  post_tasks:
+    - name: Install nginx package
+      become: true
+      ansible.builtin.yum:
+        name: nginx
+      notify: nginx_start
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Copy config file nginx.conf
+      become: true
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "/etc/nginx/{{ item.dest }}"
+        mode: "{{ item.mode }}"
+        backup: true
+      with_items:
+        - { src: './templates/nginx.conf.j2', dest: 'nginx.conf', mode: '0644' }
+        - { src: './templates/nginx_lighthouse.conf.j2', dest: 'conf.d/lighthouse.conf', mode: '0644' }
+      notify: nginx_reload
+
+    - name: Enable nginx service
+      become: true
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true

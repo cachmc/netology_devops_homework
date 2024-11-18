@@ -1,0 +1,7 @@
+---
+- name: LightHouse
+  hosts: all
+  tasks:
+    - name: "Include lighthouse"
+      include_role:
+        name: "lighthouse"

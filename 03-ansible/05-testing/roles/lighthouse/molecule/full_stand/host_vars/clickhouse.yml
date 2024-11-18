@@ -1,0 +1,32 @@
+---
+ansible_pkg_mgr: "yum"
+clickhouse_version: "22.3.3.44"
+clickhouse_listen_host:
+  - "127.0.0.1"
+  - "10.10.50.11"
+clickhouse_profiles_custom:
+  vector:
+    max_memory_usage: 10000000000
+    use_uncompressed_cache: 0
+    load_balancing: random
+    readonly: 0
+clickhouse_users_custom:
+  - { name: "lighthouse",
+      password: "lighthouse",
+      networks: { "::/0" },
+      profile: "default",
+      quota: "default",
+      dbs: [ logs ],
+      comment: "User for LightHouse"}
+  - { name: "vector",
+      password: "vector",
+      networks: { "::/0" },
+      profile: "vector",
+      quota: "default",
+      dbs: [ logs ],
+      comment: "User for Vector"}
+clickhouse_dbs_custom:
+  - { name: logs }
+clickhouse_table_name: "random_log"
+clickhouse_repo: "https://packages.clickhouse.com/rpm/stable/"
+clickhouse_repo_key: "https://packages.clickhouse.com/rpm/stable/repodata/repomd.xml.key"

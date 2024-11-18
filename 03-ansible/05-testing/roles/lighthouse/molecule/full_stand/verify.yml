@@ -1,0 +1,96 @@
+---
+# This is an example playbook to execute Ansible tests.
+- name: Verify ClickHouse
+  hosts: clickhouse
+  gather_facts: false
+  tasks:
+    - name: Checking the availability of data in the DB
+      ansible.builtin.shell: |
+        echo 'SELECT * FROM {{ clickhouse_dbs_custom[0].name }}.{{ clickhouse_table_name }} LIMIT 10;' \
+        | curl -s 'http://127.0.0.1:8123/' --data-binary @- \
+        | wc -l
+      args:
+        executable: /bin/bash
+      register: query_to_db
+
+    - name: The data is there
+      ansible.builtin.debug:
+        msg: "OK"
+      when:
+        - query_to_db.stdout | int == 10
+
+    - name: No data available
+      ansible.builtin.debug:
+        msg: "ERROR"
+      when:
+        - query_to_db.stdout | int != 10
+      failed_when: true
+
+
+- name: Verify Vector
+  hosts: vector
+  gather_facts: false
+  tasks:
+    - name: Find config files                                                               
+      ansible.builtin.find:
+        paths: /etc/vector
+      register: find_configs
+
+    - name: Validate configs vector
+      ansible.builtin.command: vector validate
+      environment:
+        VECTOR_CONFIG_DIR: /etc/vector
+      register: validate_configs
+      failed_when:
+        - validate_configs is failed
+        - "'Failed to load' not in validate_configs.stdout"
+      when: find_configs.files | length > 0
+
+    - name: Check validate configs vector
+      ansible.builtin.debug:
+        var: validate_configs.stdout_lines
+      failed_when: '"Validated" not in validate_configs.stdout'
+      when: find_configs.files | length > 0
+
+- name: Verify LightHouse
+  hosts: lighthouse
+  gather_facts: false
+  tasks:
+    - name: Checking HTTP server availability
+      ansible.builtin.uri:
+        url: http://127.0.0.1
+        return_content: true
+      register: check_http
+
+    - name: HTTP server responds
+      ansible.builtin.debug:
+        msg: "OK"
+      when: '"LightHouse" in check_http.content'
+
+    - name: HTTP server is not responding
+      ansible.builtin.debug:
+        msg: "ERROR"
+      when: '"LightHouse" not in check_http.content'
+      failed_when: true
+
+    - name: Checking the availability of data in the DB
+      ansible.builtin.shell: |
+        echo 'SELECT * FROM {{ lighthouse_ch_db }}.{{ lighthouse_ch_table }} LIMIT 10;' \
+        | curl -s -u {{ lighthouse_ch_user }}:{{ lighthouse_ch_password }} 'http://{{ lighthouse_ch_address }}:8123/' --data-binary @- \
+        | wc -l
+      args:
+        executable: /bin/bash
+      register: query_to_db
+
+    - name: The data is there
+      ansible.builtin.debug:
+        msg: "OK"
+      when:
+        - query_to_db.stdout | int == 10
+
+    - name: No data available
+      ansible.builtin.debug:
+        msg: "ERROR"
+      when:
+        - query_to_db.stdout | int != 10
+      failed_when: true

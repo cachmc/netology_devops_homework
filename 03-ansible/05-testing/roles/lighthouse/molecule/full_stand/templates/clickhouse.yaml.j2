@@ -1,0 +1,20 @@
+sources:
+  random_log:
+    type: "demo_logs"
+    format: "apache_common"
+    lines: 
+      - "line1"
+
+sinks:
+  pull_to_clickhouse:
+    type: "clickhouse"
+    inputs:
+      - "random_log"
+    endpoint: "http://{{ vector_ch_address }}:{{ vector_ch_port }}"
+    database: "{{ vector_ch_db_name }}"
+    table: "{{ vector_ch_table_name }}"
+    auth:
+      strategy: "basic"
+      user: "{{ vector_ch_user }}"
+      password: "{{ vector_ch_password }}"
+    skip_unknown_fields: true

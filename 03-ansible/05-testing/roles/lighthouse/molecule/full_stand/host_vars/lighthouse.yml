@@ -1,0 +1,7 @@
+---
+lighthouse_install_path: "/opt/lighthouse"
+lighthouse_ch_address: "10.10.50.11"
+lighthouse_ch_user: "lighthouse"
+lighthouse_ch_password: "lighthouse"
+lighthouse_ch_db: "logs"
+lighthouse_ch_table: "random_log"

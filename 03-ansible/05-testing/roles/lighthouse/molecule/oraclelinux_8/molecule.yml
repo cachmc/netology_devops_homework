@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: oraclelinux_8
+    image: docker.io/library/oraclelinux:8
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    command: /usr/sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  yamllint .
+  ansible-lint .

@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu_xenial
+    image: docker.io/library/ubuntu:xenial
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    command: /sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  yamllint .
+  ansible-lint .

@@ -1,0 +1,29 @@
+---
+# handlers file for vector
+- name: Start vector service
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.systemd:
+    name: vector
+    state: restarted
+  listen: vector_restart
+
+- name: Stop vector service
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.systemd:
+    name: vector
+    state: stopped
+  listen: vector_stop
+
+- name: Enable vector service
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.systemd:
+    name: vector
+    enabled: true
+  listen: vector_enable
+
+- name: Disable vector service
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.systemd:
+    name: vector
+    enabled: false
+  listen: vector_disable

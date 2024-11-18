@@ -1,0 +1,60 @@
+---
+dependency:
+  name: shell
+  command: |
+    ansible-galaxy install -r ./molecule/full_stand/requirements.yml --force;
+    docker network create \
+      --subnet 10.10.50.0/24 \
+      --gateway=10.10.50.1 \
+      --ip-range 10.10.50.0/24 \
+      --driver=bridge molecule \
+      &>/dev/null && echo -e "Starting create networks\n- network \"molecule\" created" \
+      || echo -e "Starting create networks\n- network \"molecule\" already exists"
+driver:
+  name: docker
+platforms:
+  - name: clickhouse
+    image: docker.io/library/centos:8
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    command: /usr/sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+    published_ports:
+      - 8123:8123
+      - 9000:9000
+    networks:
+      - name: molecule
+        ipv4_address: '10.10.50.11'
+  - name: vector
+    image: docker.io/library/centos:8
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    command: /usr/sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+    networks:
+      - name: molecule
+        ipv4_address: '10.10.50.12'
+  - name: lighthouse
+    image: docker.io/library/centos:8
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    command: /usr/sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+    published_ports:
+      - 80:80
+    networks:
+      - name: molecule
+        ipv4_address: '10.10.50.10'
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  yamllint .
+  ansible-lint .

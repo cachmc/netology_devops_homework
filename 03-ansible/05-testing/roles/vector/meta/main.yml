@@ -1,0 +1,25 @@
+galaxy_info:
+  role_name: vector
+  namespace: cachmc
+  author: Vladislav Shishkov
+
+  description: Installation and configuration of the Vector log transporter
+
+  license: MIT
+
+  min_ansible_version: 2.13
+
+  platforms:
+    - name: CentOS
+      versions:
+        - 8
+    - name: Oracle Linux
+      versions:
+        - 8
+    - name: Ubuntu
+      version:
+        - Xenial
+
+  galaxy_tags: []
+
+dependencies: []

@@ -1,0 +1,64 @@
+- name: Replace vector ENV
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.lineinfile:
+    path: /etc/default/vector
+    regexp: '^VECTOR_CONFIG_DIR='
+    line: VECTOR_CONFIG_DIR=/etc/vector
+
+- name: Delete default configs
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/etc/vector/examples"
+    - "/etc/vector/vector.yaml"
+  register: vector_delete_default_configs
+
+- name: Copy config files
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.copy:
+    dest: "/etc/vector/{{ item.key }}.yaml"
+    mode: "0644"
+    backup: true
+    content: "{{ item.value }}"
+  with_items: "{{ vector_configs_add | dict2items }}"
+  register: vector_copy_configs
+
+- name: Delete config files
+  become: "{{ true if 'sudo' in ansible_facts.packages else false }}"
+  ansible.builtin.file:
+    path: "/etc/vector/{{ item }}.yaml"
+    state: absent    
+  with_items: "{{ vector_configs_del }}"
+  register: vector_delete_configs
+
+- name: Find config files                                                               
+  ansible.builtin.find:
+    paths: /etc/vector
+  register: find_configs
+
+- name: Get state vector.service
+  ansible.builtin.service_facts:
+
+- name: If need restart vector.service
+  debug:
+    msg: "vector.service will be restarted"
+  when: 
+    - vector_copy_configs is changed or vector_delete_configs is changed or vector_delete_default_configs is changed
+    - find_configs.files | length > 0
+  changed_when: true
+  notify:
+    - vector_restart
+    - vector_enable
+
+- name: If need stop vector.service
+  debug:
+    msg: "vector.service will be stopped"
+  when:
+    - find_configs.files | length == 0
+    - '"running" in ansible_facts.services["vector.service"]["state"]' 
+  changed_when: true
+  notify:
+    - vector_stop
+    - vector_disable
