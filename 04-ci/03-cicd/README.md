@@ -43,3 +43,10 @@
 ![Скриншот 12](https://github.com/cachmc/netology_devops_homework/raw/main/04-ci/03-cicd/pictures/task-3-7.png)
 
 [pom.xml](https://github.com/cachmc/netology_devops_homework/tree/main/04-ci/03-cicd/src/pom.xml)
+
+<br>
+<br>
+
+# [Terraform](https://github.com/cachmc/netology_devops_homework/tree/main/04-ci/03-cicd/src/terraform)
+
+# [Ansible Playbook](https://github.com/cachmc/netology_devops_homework/tree/main/04-ci/03-cicd/src/playbook)

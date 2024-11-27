@@ -1,0 +1,31 @@
+# The function is used to permanently change the checksum of file. DON'T DELETE!
+# ${timestamp()}
+---
+all:
+  hosts:
+
+%{~ for i in vms ~}
+  %{~ if strcontains(i.name, "sonar") ~}
+    ${i.name}:
+      ansible_host: ${i.network_interface.0.nat_ip_address}
+  %{~ endif ~}
+%{~ endfor ~}
+%{~ for i in vms ~}
+  %{~ if strcontains(i.name, "nexus") ~}
+    ${i.name}:
+      ansible_host: ${i.network_interface.0.nat_ip_address}
+  %{~ endif ~}
+%{~ endfor ~}
+  children:
+    sonarqube:
+      hosts:
+        sonar-01:
+    nexus:
+      hosts:
+        nexus-01:
+    postgres:
+      hosts:
+        sonar-01:
+  vars:
+    ansible_connection_type: paramiko
+    ansible_user: vmshishkov
