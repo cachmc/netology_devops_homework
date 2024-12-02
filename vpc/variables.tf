@@ -20,3 +20,8 @@ variable "default_zone" {
   default     = "ru-central1-a"
   description = "https://cloud.yandex.ru/docs/overview/concepts/geo-scope"
 }
+
+variable "prefix_name" {
+  type        = string
+  description = "Prefix for network and subnet names"
+}

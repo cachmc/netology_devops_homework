@@ -54,6 +54,7 @@ resource "yandex_compute_instance" "vm" {
     nat        = var.public_ip
     ip_address = var.known_internal_ip
     security_group_ids = var.security_group_ids
+
   }
 
   metadata = {
