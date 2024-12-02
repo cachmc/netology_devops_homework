@@ -20,3 +20,15 @@ variable "default_zone" {
   default     = "ru-central1-a"
   description = "https://cloud.yandex.ru/docs/overview/concepts/geo-scope"
 }
+
+variable "s3_bucket_service_account" {
+  type        = string
+  default     = "svm-tfstate"
+  description = "S3 bucket service account"
+}
+
+variable "s3_bucket_name" {
+  type        = string
+  default     = "svm-tfstate"
+  description = "S3 bucket name"
+}
