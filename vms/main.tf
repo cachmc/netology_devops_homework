@@ -4,10 +4,11 @@ module "marketing_vm" {
   network_id     = data.terraform_remote_state.network.outputs.vpc_dev.network_id
   subnet_zones   = var.subnet_zones
   subnet_ids     = data.terraform_remote_state.network.outputs.vpc_dev.subnet_ids
+  security_group_ids = [data.terraform_remote_state.network.outputs.default_sg.id ]
   instance_name  = "marketing-vm"
   instance_count = 1
   image_family   = "ubuntu-2004-lts"
-  public_ip      = true
+#  public_ip      = true
 
   labels = {
     owner   = "v.shishkov"
@@ -30,10 +31,11 @@ module "analytics_vm" {
   network_id     = data.terraform_remote_state.network.outputs.vpc_dev.network_id
   subnet_zones   = var.subnet_zones
   subnet_ids     = data.terraform_remote_state.network.outputs.vpc_dev.subnet_ids
+  security_group_ids = [data.terraform_remote_state.network.outputs.default_sg.id ]
   instance_name  = "analytics-vm"
   instance_count = 1
   image_family   = "ubuntu-2004-lts"
-  public_ip      = true
+#  public_ip      = true
 
   labels = {
     owner   = "v.shishkov"
