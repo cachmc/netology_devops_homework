@@ -3,7 +3,7 @@ terraform {
 
   backend "s3" {
     shared_credentials_files = ["~/.aws/credentials"]
-    profile                  = "default"
+#    profile                  = "default"
     region                   = "ru-central1"
 
     bucket = "svm-tfstate"
