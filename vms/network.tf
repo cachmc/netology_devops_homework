@@ -2,7 +2,7 @@ data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
     shared_credentials_files = ["~/.aws/credentials"]
-    profile                  = "default"
+#    profile                  = "default"
     region                   = "ru-central1"
 
     bucket = "svm-tfstate"
