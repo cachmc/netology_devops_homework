@@ -57,6 +57,6 @@ data "template_file" "cloudinit" {
 
   vars = {
     ssh_user = var.ssh_user
-    ssh_key  = file(var.ssh_key_path)
+    ssh_key  = var.ssh_key
   }
 }

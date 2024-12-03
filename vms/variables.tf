@@ -32,11 +32,12 @@ variable "subnet_zones" {
 ###instance vars
 
 variable "ssh_user" {
-  type    = string
-  default = "vmshishkov"
+  type        = string
+  default     = "vmshishkov"
+  description = "SSH user"
 }
 
-variable "ssh_key_path" {
-  type    = string
-  default = "~/.ssh/id_ed25519.pub"
+variable "ssh_key" {
+  type        = string
+  description = "SSH public key"
 }
