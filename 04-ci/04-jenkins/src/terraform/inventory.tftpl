@@ -1,0 +1,30 @@
+# The function is used to permanently change the checksum of file. DON'T DELETE!
+# ${timestamp()}
+---
+all:
+  hosts:
+
+%{~ for i in vms ~}
+  %{~ if strcontains(i.name, "jenkins-master") ~}
+    ${i.name}:
+      ansible_host: ${i.network_interface.0.nat_ip_address}
+  %{~ endif ~}
+%{~ endfor ~}
+%{~ for i in vms ~}
+  %{~ if strcontains(i.name, "jenkins-agent") ~}
+    ${i.name}:
+      ansible_host: ${i.network_interface.0.nat_ip_address}
+  %{~ endif ~}
+%{~ endfor ~}
+  children:
+    jenkins:
+      children:
+        jenkins_masters:
+          hosts:
+            jenkins-master-01:
+        jenkins_agents:
+          hosts:
+              jenkins-agent-01:
+  vars:
+    ansible_connection_type: paramiko
+    ansible_user: vmshishkov

@@ -1,0 +1,1176 @@
+Started by user admin
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on agent in /opt/jenkins_agent/workspace/netology-jenkins-04
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $AWS_ACCESS_KEY_ID or $AWS_SECRET_ACCESS_KEY
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone repo)
+[Pipeline] git
+The recommended git tool is: NONE
+using credential netology-jenkins-terraform-ansible
+Fetching changes from the remote Git repository
+Checking out Revision c238b09a3b78b0e9dd783c4ad4248e8f14d9e3ec (refs/remotes/origin/master)
+Commit message: "disabled 'gather_facts'"
+ > git rev-parse --resolve-git-dir /opt/jenkins_agent/workspace/netology-jenkins-04/.git # timeout=10
+ > git config remote.origin.url https://github.com/cachmc/netology-jenkins-terraform-ansible.git # timeout=10
+Fetching upstream changes from https://github.com/cachmc/netology-jenkins-terraform-ansible.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.5'
+using GIT_SSH to set credentials https://github.com/cachmc/netology-jenkins-terraform-ansible
+[INFO] Currently running in a labeled security context
+[INFO] Currently SELinux is 'enforcing' on the host
+ > /usr/bin/chcon --type=ssh_home_t /opt/jenkins_agent/workspace/netology-jenkins-04@tmp/jenkins-gitclient-ssh12628246239692422181.key
+Verifying host key using known hosts file
+ > git fetch --tags --force --progress -- https://github.com/cachmc/netology-jenkins-terraform-ansible.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f c238b09a3b78b0e9dd783c4ad4248e8f14d9e3ec # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D master # timeout=10
+ > git checkout -b master c238b09a3b78b0e9dd783c4ad4248e8f14d9e3ec # timeout=10
+ > git rev-list --no-walk c238b09a3b78b0e9dd783c4ad4248e8f14d9e3ec # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Initialization terraform)
+[Pipeline] sh
++ terraform -chdir=./terraform/vpc init
+
+[0m[1mInitializing the backend...[0m
+[0m[1mInitializing modules...[0m
+
+[0m[1mInitializing provider plugins...[0m
+- Reusing previous version of hashicorp/random from the dependency lock file
+- Reusing previous version of yandex-cloud/yandex from the dependency lock file
+- Using previously-installed hashicorp/random v3.6.3
+- Using previously-installed yandex-cloud/yandex v0.133.0
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+[Pipeline] sh
++ terraform -chdir=./terraform/vms init
+
+[0m[1mInitializing the backend...[0m
+
+[0m[1mInitializing provider plugins...[0m
+- terraform.io/builtin/terraform is built in to Terraform
+- Reusing previous version of hashicorp/template from the dependency lock file
+- Reusing previous version of yandex-cloud/yandex from the dependency lock file
+- Reusing previous version of hashicorp/local from the dependency lock file
+- Using previously-installed hashicorp/template v2.2.0
+- Using previously-installed yandex-cloud/yandex v0.133.0
+- Using previously-installed hashicorp/local v2.5.2
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Creation of infrastructure)
+[Pipeline] sh
++ terraform -chdir=./terraform/vpc apply -auto-approve -var cloud_id=b1gckqa************* -var folder_id=b1gfoip************* -var token=t1.9euelZrPl8ePkJWMnMaak*************************************************** -var prefix_name=jenkins-04
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.vpc_dev.yandex_vpc_network.create_network[0m will be created
+[0m  [32m+[0m[0m resource "yandex_vpc_network" "create_network" {
+      [32m+[0m[0m created_at                = (known after apply)
+      [32m+[0m[0m default_security_group_id = (known after apply)
+      [32m+[0m[0m folder_id                 = (known after apply)
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m labels                    = (known after apply)
+      [32m+[0m[0m name                      = "jenkins-04"
+      [32m+[0m[0m subnet_ids                = (known after apply)
+    }
+
+[1m  # module.vpc_dev.yandex_vpc_subnet.create_subnet["0"][0m will be created
+[0m  [32m+[0m[0m resource "yandex_vpc_subnet" "create_subnet" {
+      [32m+[0m[0m created_at     = (known after apply)
+      [32m+[0m[0m folder_id      = (known after apply)
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m labels         = (known after apply)
+      [32m+[0m[0m name           = "jenkins-04-ru-central1-a"
+      [32m+[0m[0m network_id     = (known after apply)
+      [32m+[0m[0m v4_cidr_blocks = [
+          [32m+[0m[0m "10.0.1.0/24",
+        ]
+      [32m+[0m[0m v6_cidr_blocks = (known after apply)
+      [32m+[0m[0m zone           = "ru-central1-a"
+    }
+
+[1m  # module.vpc_dev.yandex_vpc_subnet.create_subnet["1"][0m will be created
+[0m  [32m+[0m[0m resource "yandex_vpc_subnet" "create_subnet" {
+      [32m+[0m[0m created_at     = (known after apply)
+      [32m+[0m[0m folder_id      = (known after apply)
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m labels         = (known after apply)
+      [32m+[0m[0m name           = "jenkins-04-ru-central1-b"
+      [32m+[0m[0m network_id     = (known after apply)
+      [32m+[0m[0m v4_cidr_blocks = [
+          [32m+[0m[0m "10.0.2.0/24",
+        ]
+      [32m+[0m[0m v6_cidr_blocks = (known after apply)
+      [32m+[0m[0m zone           = "ru-central1-b"
+    }
+
+[1m  # module.vpc_dev.yandex_vpc_subnet.create_subnet["2"][0m will be created
+[0m  [32m+[0m[0m resource "yandex_vpc_subnet" "create_subnet" {
+      [32m+[0m[0m created_at     = (known after apply)
+      [32m+[0m[0m folder_id      = (known after apply)
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m labels         = (known after apply)
+      [32m+[0m[0m name           = "jenkins-04-ru-central1-d"
+      [32m+[0m[0m network_id     = (known after apply)
+      [32m+[0m[0m v4_cidr_blocks = [
+          [32m+[0m[0m "10.0.3.0/24",
+        ]
+      [32m+[0m[0m v6_cidr_blocks = (known after apply)
+      [32m+[0m[0m zone           = "ru-central1-d"
+    }
+
+[1mPlan:[0m 4 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m vpc_dev = {
+      [32m+[0m[0m network_id = (known after apply)
+      [32m+[0m[0m subnets    = [
+          [32m+[0m[0m {
+              [32m+[0m[0m id   = (known after apply)
+              [32m+[0m[0m name = "jenkins-04-ru-central1-a"
+            },
+          [32m+[0m[0m {
+              [32m+[0m[0m id   = (known after apply)
+              [32m+[0m[0m name = "jenkins-04-ru-central1-b"
+            },
+          [32m+[0m[0m {
+              [32m+[0m[0m id   = (known after apply)
+              [32m+[0m[0m name = "jenkins-04-ru-central1-d"
+            },
+        ]
+    }
+[0m[1mmodule.vpc_dev.yandex_vpc_network.create_network: Creating...[0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_network.create_network: Creation complete after 2s [id=enpp1vukb54l894fatd9][0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["1"]: Creating...[0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["2"]: Creating...[0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["0"]: Creating...[0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["1"]: Creation complete after 0s [id=e2le698peu4991eecu4q][0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["0"]: Creation complete after 0s [id=e9b1nitt27pud9jn8qbf][0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["2"]: Creation complete after 1s [id=fl8seku9eh9s1teqcucd][0m
+[0m[1m[32m
+Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mvpc_dev = {
+  "network_id" = "enpp1vukb54l894fatd9"
+  "subnets" = [
+    {
+      "id" = "e9b1nitt27pud9jn8qbf"
+      "name" = "jenkins-04-ru-central1-a"
+    },
+    {
+      "id" = "e2le698peu4991eecu4q"
+      "name" = "jenkins-04-ru-central1-b"
+    },
+    {
+      "id" = "fl8seku9eh9s1teqcucd"
+      "name" = "jenkins-04-ru-central1-d"
+    },
+  ]
+}
+[Pipeline] sh
++ terraform -chdir=./terraform/vms apply -auto-approve -var cloud_id=b1gckqa************* -var folder_id=b1gfoip************* -var token=t1.9euelZrPl8ePkJWMnMaak*************************************************** -var count_vms=3 -var 'ssh_key=ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oL**************************'
+[0m[1mdata.terraform_remote_state.network: Reading...[0m[0m
+[0m[1mdata.template_file.cloudinit: Reading...[0m[0m
+[0m[1mdata.template_file.cloudinit: Read complete after 0s [id=9213183795abdf219ad0ba773c24b7e9b1e7f97295583abe6d2b238aa2e01bce][0m
+[0m[1mdata.yandex_compute_image.image_ubuntu: Reading...[0m[0m
+[0m[1mdata.yandex_compute_image.image_centos: Reading...[0m[0m
+[0m[1mdata.yandex_compute_image.image_centos: Read complete after 0s [id=fd8gdrfaftkcaarp40fe][0m
+[0m[1mdata.yandex_compute_image.image_ubuntu: Read complete after 0s [id=fd8scebbigbod4bj5ema][0m
+[0m[1mdata.terraform_remote_state.network: Read complete after 1s[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # local_file.inventory_templatefile[0m will be created
+[0m  [32m+[0m[0m resource "local_file" "inventory_templatefile" {
+      [32m+[0m[0m content              = (known after apply)
+      [32m+[0m[0m content_base64sha256 = (known after apply)
+      [32m+[0m[0m content_base64sha512 = (known after apply)
+      [32m+[0m[0m content_md5          = (known after apply)
+      [32m+[0m[0m content_sha1         = (known after apply)
+      [32m+[0m[0m content_sha256       = (known after apply)
+      [32m+[0m[0m content_sha512       = (known after apply)
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "/opt/jenkins_agent/workspace/netology-jenkins-04/terraform/vms/../../ansible/inventory/test.yml"
+      [32m+[0m[0m id                   = (known after apply)
+    }
+
+[1m  # yandex_compute_instance.create_vms[0][0m will be created
+[0m  [32m+[0m[0m resource "yandex_compute_instance" "create_vms" {
+      [32m+[0m[0m created_at                = (known after apply)
+      [32m+[0m[0m folder_id                 = (known after apply)
+      [32m+[0m[0m fqdn                      = (known after apply)
+      [32m+[0m[0m gpu_cluster_id            = (known after apply)
+      [32m+[0m[0m hardware_generation       = (known after apply)
+      [32m+[0m[0m hostname                  = "java-test-1"
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m labels                    = {
+          [32m+[0m[0m "owner"   = "v.shishkov"
+          [32m+[0m[0m "project" = "java-machine"
+        }
+      [32m+[0m[0m maintenance_grace_period  = (known after apply)
+      [32m+[0m[0m maintenance_policy        = (known after apply)
+      [32m+[0m[0m metadata                  = {
+          [32m+[0m[0m "serial-port-enable" = "1"
+          [32m+[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                datasource:
+                  Ec2:
+                    strict_id: false
+                
+                ssh_pwauth: no
+                
+                users:
+                  - name: vmshishkov
+                    sudo: ALL=(ALL) NOPASSWD:ALL
+                    shell: /bin/bash
+                    ssh_authorized_keys:
+                       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLskaY3H39j5ZSdodVRfmvBntSaVyiieWnKOyNnRh
+                
+                package_update: true
+                package_upgrade: true
+                                
+                packages:
+                  - nano
+                  - python3-pip
+            EOT
+        }
+      [32m+[0m[0m name                      = "java-test-1"
+      [32m+[0m[0m network_acceleration_type = "standard"
+      [32m+[0m[0m platform_id               = "standard-v1"
+      [32m+[0m[0m service_account_id        = (known after apply)
+      [32m+[0m[0m status                    = (known after apply)
+      [32m+[0m[0m zone                      = "ru-central1-a"
+
+      [32m+[0m[0m boot_disk {
+          [32m+[0m[0m auto_delete = true
+          [32m+[0m[0m device_name = (known after apply)
+          [32m+[0m[0m disk_id     = (known after apply)
+          [32m+[0m[0m mode        = (known after apply)
+
+          [32m+[0m[0m initialize_params {
+              [32m+[0m[0m block_size  = (known after apply)
+              [32m+[0m[0m description = (known after apply)
+              [32m+[0m[0m image_id    = "fd8gdrfaftkcaarp40fe"
+              [32m+[0m[0m name        = (known after apply)
+              [32m+[0m[0m size        = 10
+              [32m+[0m[0m snapshot_id = (known after apply)
+              [32m+[0m[0m type        = "network-hdd"
+            }
+        }
+
+      [32m+[0m[0m network_interface {
+          [32m+[0m[0m index              = (known after apply)
+          [32m+[0m[0m ip_address         = (known after apply)
+          [32m+[0m[0m ipv4               = true
+          [32m+[0m[0m ipv6               = (known after apply)
+          [32m+[0m[0m ipv6_address       = (known after apply)
+          [32m+[0m[0m mac_address        = (known after apply)
+          [32m+[0m[0m nat                = true
+          [32m+[0m[0m nat_ip_address     = (known after apply)
+          [32m+[0m[0m nat_ip_version     = (known after apply)
+          [32m+[0m[0m security_group_ids = (known after apply)
+          [32m+[0m[0m subnet_id          = "e9b1nitt27pud9jn8qbf"
+        }
+
+      [32m+[0m[0m resources {
+          [32m+[0m[0m core_fraction = 5
+          [32m+[0m[0m cores         = 2
+          [32m+[0m[0m memory        = 1
+        }
+
+      [32m+[0m[0m scheduling_policy {
+          [32m+[0m[0m preemptible = true
+        }
+    }
+
+[1m  # yandex_compute_instance.create_vms[1][0m will be created
+[0m  [32m+[0m[0m resource "yandex_compute_instance" "create_vms" {
+      [32m+[0m[0m created_at                = (known after apply)
+      [32m+[0m[0m folder_id                 = (known after apply)
+      [32m+[0m[0m fqdn                      = (known after apply)
+      [32m+[0m[0m gpu_cluster_id            = (known after apply)
+      [32m+[0m[0m hardware_generation       = (known after apply)
+      [32m+[0m[0m hostname                  = "java-test-2"
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m labels                    = {
+          [32m+[0m[0m "owner"   = "v.shishkov"
+          [32m+[0m[0m "project" = "java-machine"
+        }
+      [32m+[0m[0m maintenance_grace_period  = (known after apply)
+      [32m+[0m[0m maintenance_policy        = (known after apply)
+      [32m+[0m[0m metadata                  = {
+          [32m+[0m[0m "serial-port-enable" = "1"
+          [32m+[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                datasource:
+                  Ec2:
+                    strict_id: false
+                
+                ssh_pwauth: no
+                
+                users:
+                  - name: vmshishkov
+                    sudo: ALL=(ALL) NOPASSWD:ALL
+                    shell: /bin/bash
+                    ssh_authorized_keys:
+                       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLskaY3H39j5ZSdodVRfmvBntSaVyiieWnKOyNnRh
+                
+                package_update: true
+                package_upgrade: true
+                                
+                packages:
+                  - nano
+                  - python3-pip
+            EOT
+        }
+      [32m+[0m[0m name                      = "java-test-2"
+      [32m+[0m[0m network_acceleration_type = "standard"
+      [32m+[0m[0m platform_id               = "standard-v1"
+      [32m+[0m[0m service_account_id        = (known after apply)
+      [32m+[0m[0m status                    = (known after apply)
+      [32m+[0m[0m zone                      = "ru-central1-b"
+
+      [32m+[0m[0m boot_disk {
+          [32m+[0m[0m auto_delete = true
+          [32m+[0m[0m device_name = (known after apply)
+          [32m+[0m[0m disk_id     = (known after apply)
+          [32m+[0m[0m mode        = (known after apply)
+
+          [32m+[0m[0m initialize_params {
+              [32m+[0m[0m block_size  = (known after apply)
+              [32m+[0m[0m description = (known after apply)
+              [32m+[0m[0m image_id    = "fd8gdrfaftkcaarp40fe"
+              [32m+[0m[0m name        = (known after apply)
+              [32m+[0m[0m size        = 10
+              [32m+[0m[0m snapshot_id = (known after apply)
+              [32m+[0m[0m type        = "network-hdd"
+            }
+        }
+
+      [32m+[0m[0m network_interface {
+          [32m+[0m[0m index              = (known after apply)
+          [32m+[0m[0m ip_address         = (known after apply)
+          [32m+[0m[0m ipv4               = true
+          [32m+[0m[0m ipv6               = (known after apply)
+          [32m+[0m[0m ipv6_address       = (known after apply)
+          [32m+[0m[0m mac_address        = (known after apply)
+          [32m+[0m[0m nat                = true
+          [32m+[0m[0m nat_ip_address     = (known after apply)
+          [32m+[0m[0m nat_ip_version     = (known after apply)
+          [32m+[0m[0m security_group_ids = (known after apply)
+          [32m+[0m[0m subnet_id          = "e2le698peu4991eecu4q"
+        }
+
+      [32m+[0m[0m resources {
+          [32m+[0m[0m core_fraction = 5
+          [32m+[0m[0m cores         = 2
+          [32m+[0m[0m memory        = 1
+        }
+
+      [32m+[0m[0m scheduling_policy {
+          [32m+[0m[0m preemptible = true
+        }
+    }
+
+[1m  # yandex_compute_instance.create_vms[2][0m will be created
+[0m  [32m+[0m[0m resource "yandex_compute_instance" "create_vms" {
+      [32m+[0m[0m created_at                = (known after apply)
+      [32m+[0m[0m folder_id                 = (known after apply)
+      [32m+[0m[0m fqdn                      = (known after apply)
+      [32m+[0m[0m gpu_cluster_id            = (known after apply)
+      [32m+[0m[0m hardware_generation       = (known after apply)
+      [32m+[0m[0m hostname                  = "java-test-3"
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m labels                    = {
+          [32m+[0m[0m "owner"   = "v.shishkov"
+          [32m+[0m[0m "project" = "java-machine"
+        }
+      [32m+[0m[0m maintenance_grace_period  = (known after apply)
+      [32m+[0m[0m maintenance_policy        = (known after apply)
+      [32m+[0m[0m metadata                  = {
+          [32m+[0m[0m "serial-port-enable" = "1"
+          [32m+[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                datasource:
+                  Ec2:
+                    strict_id: false
+                
+                ssh_pwauth: no
+                
+                users:
+                  - name: vmshishkov
+                    sudo: ALL=(ALL) NOPASSWD:ALL
+                    shell: /bin/bash
+                    ssh_authorized_keys:
+                       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLskaY3H39j5ZSdodVRfmvBntSaVyiieWnKOyNnRh
+                
+                package_update: true
+                package_upgrade: true
+                                
+                packages:
+                  - nano
+                  - python3-pip
+            EOT
+        }
+      [32m+[0m[0m name                      = "java-test-3"
+      [32m+[0m[0m network_acceleration_type = "standard"
+      [32m+[0m[0m platform_id               = "standard-v1"
+      [32m+[0m[0m service_account_id        = (known after apply)
+      [32m+[0m[0m status                    = (known after apply)
+      [32m+[0m[0m zone                      = "ru-central1-a"
+
+      [32m+[0m[0m boot_disk {
+          [32m+[0m[0m auto_delete = true
+          [32m+[0m[0m device_name = (known after apply)
+          [32m+[0m[0m disk_id     = (known after apply)
+          [32m+[0m[0m mode        = (known after apply)
+
+          [32m+[0m[0m initialize_params {
+              [32m+[0m[0m block_size  = (known after apply)
+              [32m+[0m[0m description = (known after apply)
+              [32m+[0m[0m image_id    = "fd8gdrfaftkcaarp40fe"
+              [32m+[0m[0m name        = (known after apply)
+              [32m+[0m[0m size        = 10
+              [32m+[0m[0m snapshot_id = (known after apply)
+              [32m+[0m[0m type        = "network-hdd"
+            }
+        }
+
+      [32m+[0m[0m network_interface {
+          [32m+[0m[0m index              = (known after apply)
+          [32m+[0m[0m ip_address         = (known after apply)
+          [32m+[0m[0m ipv4               = true
+          [32m+[0m[0m ipv6               = (known after apply)
+          [32m+[0m[0m ipv6_address       = (known after apply)
+          [32m+[0m[0m mac_address        = (known after apply)
+          [32m+[0m[0m nat                = true
+          [32m+[0m[0m nat_ip_address     = (known after apply)
+          [32m+[0m[0m nat_ip_version     = (known after apply)
+          [32m+[0m[0m security_group_ids = (known after apply)
+          [32m+[0m[0m subnet_id          = "e9b1nitt27pud9jn8qbf"
+        }
+
+      [32m+[0m[0m resources {
+          [32m+[0m[0m core_fraction = 5
+          [32m+[0m[0m cores         = 2
+          [32m+[0m[0m memory        = 1
+        }
+
+      [32m+[0m[0m scheduling_policy {
+          [32m+[0m[0m preemptible = true
+        }
+    }
+
+[1mPlan:[0m 4 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m dynamic_vms = [
+      [32m+[0m[0m {
+          [32m+[0m[0m external_ip = (known after apply)
+          [32m+[0m[0m fqdn        = (known after apply)
+          [32m+[0m[0m id          = (known after apply)
+          [32m+[0m[0m name        = "java-test-1"
+        },
+      [32m+[0m[0m {
+          [32m+[0m[0m external_ip = (known after apply)
+          [32m+[0m[0m fqdn        = (known after apply)
+          [32m+[0m[0m id          = (known after apply)
+          [32m+[0m[0m name        = "java-test-2"
+        },
+      [32m+[0m[0m {
+          [32m+[0m[0m external_ip = (known after apply)
+          [32m+[0m[0m fqdn        = (known after apply)
+          [32m+[0m[0m id          = (known after apply)
+          [32m+[0m[0m name        = "java-test-3"
+        },
+    ]
+[0m[1myandex_compute_instance.create_vms[1]: Creating...[0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Creating...[0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Creating...[0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still creating... [10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still creating... [10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still creating... [20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still creating... [20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [30s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still creating... [30s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still creating... [30s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [40s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still creating... [40s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still creating... [40s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [50s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still creating... [50s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still creating... [50s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Creation complete after 52s [id=fhmf6h5gusge4km1cjd8][0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [1m0s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still creating... [1m0s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Creation complete after 1m7s [id=fhmvrrpoorka5f4fh8iv][0m
+[0m[1myandex_compute_instance.create_vms[1]: Still creating... [1m10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Creation complete after 1m14s [id=epdce3mt6bgfm625dt55][0m
+[0m[1mlocal_file.inventory_templatefile: Creating...[0m[0m
+[0m[1mlocal_file.inventory_templatefile: Creation complete after 0s [id=31dbf11e98f327c1e4f7442a00725d88297b198e][0m
+[0m[1m[32m
+Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mdynamic_vms = [
+  {
+    "external_ip" = "51.250.78.28"
+    "fqdn" = "java-test-1.ru-central1.internal"
+    "id" = "fhmvrrpoorka5f4fh8iv"
+    "name" = "java-test-1"
+  },
+  {
+    "external_ip" = "130.193.41.157"
+    "fqdn" = "java-test-2.ru-central1.internal"
+    "id" = "epdce3mt6bgfm625dt55"
+    "name" = "java-test-2"
+  },
+  {
+    "external_ip" = "51.250.7.175"
+    "fqdn" = "java-test-3.ru-central1.internal"
+    "id" = "fhmf6h5gusge4km1cjd8"
+    "name" = "java-test-3"
+  },
+]
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Setting of infrastructure)
+[Pipeline] sh
++ ansible-playbook -i ./ansible/inventory/test.yml ./ansible/site.yml
+[WARNING]: Invalid characters were found in group names but not replaced, use
+-vvvv to see details
+
+PLAY [Install Java] ************************************************************
+
+TASK [Wait for host to become reachable] ***************************************
+ok: [java-test-3]
+ok: [java-test-2]
+ok: [java-test-1]
+
+TASK [java : Upload .tar.gz file containing binaries from local storage] *******
+skipping: [java-test-1]
+skipping: [java-test-2]
+skipping: [java-test-3]
+
+TASK [java : Upload .tar.gz file conaining binaries from remote storage] *******
+changed: [java-test-1]
+changed: [java-test-2]
+changed: [java-test-3]
+
+TASK [java : Ensure installation dir exists] ***********************************
+changed: [java-test-3]
+changed: [java-test-2]
+changed: [java-test-1]
+
+TASK [java : Extract java in the installation directory] ***********************
+changed: [java-test-1]
+changed: [java-test-2]
+changed: [java-test-3]
+
+TASK [java : Export environment variables] *************************************
+changed: [java-test-3]
+changed: [java-test-1]
+changed: [java-test-2]
+
+PLAY RECAP *********************************************************************
+java-test-1                : ok=5    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+java-test-2                : ok=5    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+java-test-3                : ok=5    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Destroy infrastructure)
+[Pipeline] sh
++ terraform -chdir=./terraform/vms destroy -auto-approve -var cloud_id=b1gckqa************* -var folder_id=b1gfoip************* -var token=t1.9euelZrPl8ePkJWMnMaak*************************************************** -var count_vms=3 -var 'ssh_key=ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLs***************************'
+[0m[1mdata.terraform_remote_state.network: Reading...[0m[0m
+[0m[1mdata.template_file.cloudinit: Reading...[0m[0m
+[0m[1mdata.template_file.cloudinit: Read complete after 0s [id=9213183795abdf219ad0ba773c24b7e9b1e7f97295583abe6d2b238aa2e01bce][0m
+[0m[1mdata.yandex_compute_image.image_centos: Reading...[0m[0m
+[0m[1mdata.yandex_compute_image.image_ubuntu: Reading...[0m[0m
+[0m[1mdata.terraform_remote_state.network: Read complete after 0s[0m
+[0m[1mdata.yandex_compute_image.image_centos: Read complete after 0s [id=fd8gdrfaftkcaarp40fe][0m
+[0m[1myandex_compute_instance.create_vms[0]: Refreshing state... [id=fhmvrrpoorka5f4fh8iv][0m
+[0m[1myandex_compute_instance.create_vms[1]: Refreshing state... [id=epdce3mt6bgfm625dt55][0m
+[0m[1myandex_compute_instance.create_vms[2]: Refreshing state... [id=fhmf6h5gusge4km1cjd8][0m
+[0m[1mdata.yandex_compute_image.image_ubuntu: Read complete after 0s [id=fd8scebbigbod4bj5ema][0m
+[0m[1mlocal_file.inventory_templatefile: Refreshing state... [id=31dbf11e98f327c1e4f7442a00725d88297b198e][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # local_file.inventory_templatefile[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "inventory_templatefile" {
+      [31m-[0m[0m content              = <<-EOT
+            # The function is used to permanently change the checksum of file. DON'T DELETE!
+            # 2024-12-05T16:20:15Z
+            ---
+            java_app::
+              hosts:
+                java-test-1:
+                  ansible_host: 51.250.78.28
+                java-test-2:
+                  ansible_host: 130.193.41.157
+                java-test-3:
+                  ansible_host: 51.250.7.175
+              vars:
+                ansible_ssh_user: vmshishkov
+                ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "hmJ1m37lRLEqwJYjFHBbVSqpfr1sFE+HHpOzT50+DTE=" [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha512 = "TtD/m6J59sCQEF85KmpXq6CeFYTTREAywQY4C3xaUTOtWqjOYNuafoD7HYXugHK8eO+9xzhUkLqMYuP07dqY2w==" [90m-> null[0m[0m
+      [31m-[0m[0m content_md5          = "b6ca938f005a497d6217ed718cf59a45" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha1         = "31dbf11e98f327c1e4f7442a00725d88297b198e" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha256       = "8662759b7ee544b12ac0962314705b552aa97ebd6c144f871e93b34f9d3e0d31" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha512       = "4ed0ff9ba279f6c090105f392a6a57aba09e1584d3444032c106380b7c5a5133ad5aa8ce60db9a7e80fb1d85ee8072bc78efbdc7385490ba8c62e3f4edda98db" [90m-> null[0m[0m
+      [31m-[0m[0m directory_permission = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m file_permission      = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m filename             = "/opt/jenkins_agent/workspace/netology-jenkins-04/terraform/vms/../../ansible/inventory/test.yml" [90m-> null[0m[0m
+      [31m-[0m[0m id                   = "31dbf11e98f327c1e4f7442a00725d88297b198e" [90m-> null[0m[0m
+    }
+
+[1m  # yandex_compute_instance.create_vms[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_compute_instance" "create_vms" {
+      [31m-[0m[0m created_at                = "2024-12-05T16:19:01Z" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id                 = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m fqdn                      = "java-test-1.ru-central1.internal" [90m-> null[0m[0m
+      [31m-[0m[0m hardware_generation       = [
+          [31m-[0m[0m {
+              [31m-[0m[0m generation2_features = []
+              [31m-[0m[0m legacy_features      = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m pci_topology = "PCI_TOPOLOGY_V1"
+                    },
+                ]
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m hostname                  = "java-test-1" [90m-> null[0m[0m
+      [31m-[0m[0m id                        = "fhmvrrpoorka5f4fh8iv" [90m-> null[0m[0m
+      [31m-[0m[0m labels                    = {
+          [31m-[0m[0m "owner"   = "v.shishkov"
+          [31m-[0m[0m "project" = "java-machine"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m metadata                  = {
+          [31m-[0m[0m "serial-port-enable" = "1"
+          [31m-[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                datasource:
+                  Ec2:
+                    strict_id: false
+                
+                ssh_pwauth: no
+                
+                users:
+                  - name: vmshishkov
+                    sudo: ALL=(ALL) NOPASSWD:ALL
+                    shell: /bin/bash
+                    ssh_authorized_keys:
+                       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3o**********************
+                
+                package_update: true
+                package_upgrade: true
+                                
+                packages:
+                  - nano
+                  - python3-pip
+            EOT
+        } [90m-> null[0m[0m
+      [31m-[0m[0m name                      = "java-test-1" [90m-> null[0m[0m
+      [31m-[0m[0m network_acceleration_type = "standard" [90m-> null[0m[0m
+      [31m-[0m[0m platform_id               = "standard-v1" [90m-> null[0m[0m
+      [31m-[0m[0m status                    = "running" [90m-> null[0m[0m
+      [31m-[0m[0m zone                      = "ru-central1-a" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m boot_disk {
+          [31m-[0m[0m auto_delete = true [90m-> null[0m[0m
+          [31m-[0m[0m device_name = "fhmetq3k75lmh0iivsn4" [90m-> null[0m[0m
+          [31m-[0m[0m disk_id     = "fhmetq3k75lmh0iivsn4" [90m-> null[0m[0m
+          [31m-[0m[0m mode        = "READ_WRITE" [90m-> null[0m[0m
+
+          [31m-[0m[0m initialize_params {
+              [31m-[0m[0m block_size  = 4096 [90m-> null[0m[0m
+              [31m-[0m[0m image_id    = "fd8gdrfaftkcaarp40fe" [90m-> null[0m[0m
+                name        = [90mnull[0m[0m
+              [31m-[0m[0m size        = 10 [90m-> null[0m[0m
+              [31m-[0m[0m type        = "network-hdd" [90m-> null[0m[0m
+                [90m# (2 unchanged attributes hidden)[0m[0m
+            }
+        }
+
+      [31m-[0m[0m metadata_options {
+          [31m-[0m[0m aws_v1_http_endpoint = 1 [90m-> null[0m[0m
+          [31m-[0m[0m aws_v1_http_token    = 2 [90m-> null[0m[0m
+          [31m-[0m[0m gce_http_endpoint    = 1 [90m-> null[0m[0m
+          [31m-[0m[0m gce_http_token       = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m network_interface {
+          [31m-[0m[0m index              = 0 [90m-> null[0m[0m
+          [31m-[0m[0m ip_address         = "10.0.1.28" [90m-> null[0m[0m
+          [31m-[0m[0m ipv4               = true [90m-> null[0m[0m
+          [31m-[0m[0m ipv6               = false [90m-> null[0m[0m
+          [31m-[0m[0m mac_address        = "d0:0d:1f:de:f3:8c" [90m-> null[0m[0m
+          [31m-[0m[0m nat                = true [90m-> null[0m[0m
+          [31m-[0m[0m nat_ip_address     = "51.250.78.28" [90m-> null[0m[0m
+          [31m-[0m[0m nat_ip_version     = "IPV4" [90m-> null[0m[0m
+          [31m-[0m[0m security_group_ids = [] [90m-> null[0m[0m
+          [31m-[0m[0m subnet_id          = "e9b1nitt27pud9jn8qbf" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m placement_policy {
+          [31m-[0m[0m host_affinity_rules       = [] [90m-> null[0m[0m
+          [31m-[0m[0m placement_group_partition = 0 [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m resources {
+          [31m-[0m[0m core_fraction = 5 [90m-> null[0m[0m
+          [31m-[0m[0m cores         = 2 [90m-> null[0m[0m
+          [31m-[0m[0m gpus          = 0 [90m-> null[0m[0m
+          [31m-[0m[0m memory        = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m scheduling_policy {
+          [31m-[0m[0m preemptible = true [90m-> null[0m[0m
+        }
+    }
+
+[1m  # yandex_compute_instance.create_vms[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_compute_instance" "create_vms" {
+      [31m-[0m[0m created_at                = "2024-12-05T16:19:01Z" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id                 = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m fqdn                      = "java-test-2.ru-central1.internal" [90m-> null[0m[0m
+      [31m-[0m[0m hardware_generation       = [
+          [31m-[0m[0m {
+              [31m-[0m[0m generation2_features = []
+              [31m-[0m[0m legacy_features      = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m pci_topology = "PCI_TOPOLOGY_V1"
+                    },
+                ]
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m hostname                  = "java-test-2" [90m-> null[0m[0m
+      [31m-[0m[0m id                        = "epdce3mt6bgfm625dt55" [90m-> null[0m[0m
+      [31m-[0m[0m labels                    = {
+          [31m-[0m[0m "owner"   = "v.shishkov"
+          [31m-[0m[0m "project" = "java-machine"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m metadata                  = {
+          [31m-[0m[0m "serial-port-enable" = "1"
+          [31m-[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                datasource:
+                  Ec2:
+                    strict_id: false
+                
+                ssh_pwauth: no
+                
+                users:
+                  - name: vmshishkov
+                    sudo: ALL=(ALL) NOPASSWD:ALL
+                    shell: /bin/bash
+                    ssh_authorized_keys:
+                       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3o**********************
+                
+                package_update: true
+                package_upgrade: true
+                                
+                packages:
+                  - nano
+                  - python3-pip
+            EOT
+        } [90m-> null[0m[0m
+      [31m-[0m[0m name                      = "java-test-2" [90m-> null[0m[0m
+      [31m-[0m[0m network_acceleration_type = "standard" [90m-> null[0m[0m
+      [31m-[0m[0m platform_id               = "standard-v1" [90m-> null[0m[0m
+      [31m-[0m[0m status                    = "running" [90m-> null[0m[0m
+      [31m-[0m[0m zone                      = "ru-central1-b" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m boot_disk {
+          [31m-[0m[0m auto_delete = true [90m-> null[0m[0m
+          [31m-[0m[0m device_name = "epdfvdpnvj925mmivbvu" [90m-> null[0m[0m
+          [31m-[0m[0m disk_id     = "epdfvdpnvj925mmivbvu" [90m-> null[0m[0m
+          [31m-[0m[0m mode        = "READ_WRITE" [90m-> null[0m[0m
+
+          [31m-[0m[0m initialize_params {
+              [31m-[0m[0m block_size  = 4096 [90m-> null[0m[0m
+              [31m-[0m[0m image_id    = "fd8gdrfaftkcaarp40fe" [90m-> null[0m[0m
+                name        = [90mnull[0m[0m
+              [31m-[0m[0m size        = 10 [90m-> null[0m[0m
+              [31m-[0m[0m type        = "network-hdd" [90m-> null[0m[0m
+                [90m# (2 unchanged attributes hidden)[0m[0m
+            }
+        }
+
+      [31m-[0m[0m metadata_options {
+          [31m-[0m[0m aws_v1_http_endpoint = 1 [90m-> null[0m[0m
+          [31m-[0m[0m aws_v1_http_token    = 2 [90m-> null[0m[0m
+          [31m-[0m[0m gce_http_endpoint    = 1 [90m-> null[0m[0m
+          [31m-[0m[0m gce_http_token       = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m network_interface {
+          [31m-[0m[0m index              = 0 [90m-> null[0m[0m
+          [31m-[0m[0m ip_address         = "10.0.2.31" [90m-> null[0m[0m
+          [31m-[0m[0m ipv4               = true [90m-> null[0m[0m
+          [31m-[0m[0m ipv6               = false [90m-> null[0m[0m
+          [31m-[0m[0m mac_address        = "d0:0d:c7:0e:dd:32" [90m-> null[0m[0m
+          [31m-[0m[0m nat                = true [90m-> null[0m[0m
+          [31m-[0m[0m nat_ip_address     = "130.193.41.157" [90m-> null[0m[0m
+          [31m-[0m[0m nat_ip_version     = "IPV4" [90m-> null[0m[0m
+          [31m-[0m[0m security_group_ids = [] [90m-> null[0m[0m
+          [31m-[0m[0m subnet_id          = "e2le698peu4991eecu4q" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m placement_policy {
+          [31m-[0m[0m host_affinity_rules       = [] [90m-> null[0m[0m
+          [31m-[0m[0m placement_group_partition = 0 [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m resources {
+          [31m-[0m[0m core_fraction = 5 [90m-> null[0m[0m
+          [31m-[0m[0m cores         = 2 [90m-> null[0m[0m
+          [31m-[0m[0m gpus          = 0 [90m-> null[0m[0m
+          [31m-[0m[0m memory        = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m scheduling_policy {
+          [31m-[0m[0m preemptible = true [90m-> null[0m[0m
+        }
+    }
+
+[1m  # yandex_compute_instance.create_vms[2][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_compute_instance" "create_vms" {
+      [31m-[0m[0m created_at                = "2024-12-05T16:19:01Z" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id                 = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m fqdn                      = "java-test-3.ru-central1.internal" [90m-> null[0m[0m
+      [31m-[0m[0m hardware_generation       = [
+          [31m-[0m[0m {
+              [31m-[0m[0m generation2_features = []
+              [31m-[0m[0m legacy_features      = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m pci_topology = "PCI_TOPOLOGY_V1"
+                    },
+                ]
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m hostname                  = "java-test-3" [90m-> null[0m[0m
+      [31m-[0m[0m id                        = "fhmf6h5gusge4km1cjd8" [90m-> null[0m[0m
+      [31m-[0m[0m labels                    = {
+          [31m-[0m[0m "owner"   = "v.shishkov"
+          [31m-[0m[0m "project" = "java-machine"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m metadata                  = {
+          [31m-[0m[0m "serial-port-enable" = "1"
+          [31m-[0m[0m "user-data"          = <<-EOT
+                #cloud-config
+                datasource:
+                  Ec2:
+                    strict_id: false
+                
+                ssh_pwauth: no
+                
+                users:
+                  - name: vmshishkov
+                    sudo: ALL=(ALL) NOPASSWD:ALL
+                    shell: /bin/bash
+                    ssh_authorized_keys:
+                       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3o**********************
+                
+                package_update: true
+                package_upgrade: true
+                                
+                packages:
+                  - nano
+                  - python3-pip
+            EOT
+        } [90m-> null[0m[0m
+      [31m-[0m[0m name                      = "java-test-3" [90m-> null[0m[0m
+      [31m-[0m[0m network_acceleration_type = "standard" [90m-> null[0m[0m
+      [31m-[0m[0m platform_id               = "standard-v1" [90m-> null[0m[0m
+      [31m-[0m[0m status                    = "running" [90m-> null[0m[0m
+      [31m-[0m[0m zone                      = "ru-central1-a" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m boot_disk {
+          [31m-[0m[0m auto_delete = true [90m-> null[0m[0m
+          [31m-[0m[0m device_name = "fhmhlmc1r2gufcobrdna" [90m-> null[0m[0m
+          [31m-[0m[0m disk_id     = "fhmhlmc1r2gufcobrdna" [90m-> null[0m[0m
+          [31m-[0m[0m mode        = "READ_WRITE" [90m-> null[0m[0m
+
+          [31m-[0m[0m initialize_params {
+              [31m-[0m[0m block_size  = 4096 [90m-> null[0m[0m
+              [31m-[0m[0m image_id    = "fd8gdrfaftkcaarp40fe" [90m-> null[0m[0m
+                name        = [90mnull[0m[0m
+              [31m-[0m[0m size        = 10 [90m-> null[0m[0m
+              [31m-[0m[0m type        = "network-hdd" [90m-> null[0m[0m
+                [90m# (2 unchanged attributes hidden)[0m[0m
+            }
+        }
+
+      [31m-[0m[0m metadata_options {
+          [31m-[0m[0m aws_v1_http_endpoint = 1 [90m-> null[0m[0m
+          [31m-[0m[0m aws_v1_http_token    = 2 [90m-> null[0m[0m
+          [31m-[0m[0m gce_http_endpoint    = 1 [90m-> null[0m[0m
+          [31m-[0m[0m gce_http_token       = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m network_interface {
+          [31m-[0m[0m index              = 0 [90m-> null[0m[0m
+          [31m-[0m[0m ip_address         = "10.0.1.12" [90m-> null[0m[0m
+          [31m-[0m[0m ipv4               = true [90m-> null[0m[0m
+          [31m-[0m[0m ipv6               = false [90m-> null[0m[0m
+          [31m-[0m[0m mac_address        = "d0:0d:f3:44:b0:f7" [90m-> null[0m[0m
+          [31m-[0m[0m nat                = true [90m-> null[0m[0m
+          [31m-[0m[0m nat_ip_address     = "51.250.7.175" [90m-> null[0m[0m
+          [31m-[0m[0m nat_ip_version     = "IPV4" [90m-> null[0m[0m
+          [31m-[0m[0m security_group_ids = [] [90m-> null[0m[0m
+          [31m-[0m[0m subnet_id          = "e9b1nitt27pud9jn8qbf" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m placement_policy {
+          [31m-[0m[0m host_affinity_rules       = [] [90m-> null[0m[0m
+          [31m-[0m[0m placement_group_partition = 0 [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m resources {
+          [31m-[0m[0m core_fraction = 5 [90m-> null[0m[0m
+          [31m-[0m[0m cores         = 2 [90m-> null[0m[0m
+          [31m-[0m[0m gpus          = 0 [90m-> null[0m[0m
+          [31m-[0m[0m memory        = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m scheduling_policy {
+          [31m-[0m[0m preemptible = true [90m-> null[0m[0m
+        }
+    }
+
+[1mPlan:[0m 0 to add, 0 to change, 4 to destroy.
+[0m
+Changes to Outputs:
+  [31m-[0m[0m dynamic_vms = [
+      [31m-[0m[0m {
+          [31m-[0m[0m external_ip = "51.250.78.28"
+          [31m-[0m[0m fqdn        = "java-test-1.ru-central1.internal"
+          [31m-[0m[0m id          = "fhmvrrpoorka5f4fh8iv"
+          [31m-[0m[0m name        = "java-test-1"
+        },
+      [31m-[0m[0m {
+          [31m-[0m[0m external_ip = "130.193.41.157"
+          [31m-[0m[0m fqdn        = "java-test-2.ru-central1.internal"
+          [31m-[0m[0m id          = "epdce3mt6bgfm625dt55"
+          [31m-[0m[0m name        = "java-test-2"
+        },
+      [31m-[0m[0m {
+          [31m-[0m[0m external_ip = "51.250.7.175"
+          [31m-[0m[0m fqdn        = "java-test-3.ru-central1.internal"
+          [31m-[0m[0m id          = "fhmf6h5gusge4km1cjd8"
+          [31m-[0m[0m name        = "java-test-3"
+        },
+    ] [90m-> null[0m[0m
+[0m[1mlocal_file.inventory_templatefile: Destroying... [id=31dbf11e98f327c1e4f7442a00725d88297b198e][0m[0m
+[0m[1mlocal_file.inventory_templatefile: Destruction complete after 0s[0m
+[0m[1myandex_compute_instance.create_vms[0]: Destroying... [id=fhmvrrpoorka5f4fh8iv][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Destroying... [id=fhmf6h5gusge4km1cjd8][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Destroying... [id=epdce3mt6bgfm625dt55][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 30s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 30s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 30s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 40s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 40s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 40s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 50s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 50s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 50s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 1m0s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 1m0s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 1m0s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 1m10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Still destroying... [id=fhmf6h5gusge4km1cjd8, 1m10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 1m10s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[2]: Destruction complete after 1m18s[0m
+[0m[1myandex_compute_instance.create_vms[0]: Still destroying... [id=fhmvrrpoorka5f4fh8iv, 1m20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Still destroying... [id=epdce3mt6bgfm625dt55, 1m20s elapsed][0m[0m
+[0m[1myandex_compute_instance.create_vms[1]: Destruction complete after 1m23s[0m
+[0m[1myandex_compute_instance.create_vms[0]: Destruction complete after 1m26s[0m
+[0m[1m[32m
+Destroy complete! Resources: 4 destroyed.
+[0m
+[Pipeline] sh
++ terraform -chdir=./terraform/vpc destroy -auto-approve -var cloud_id=b1gckqa************* -var folder_id=b1gfoip************* -var token=t1.9euelZrPl8ePkJWMnMaak*************************************************** -var prefix_name=jenkins-04
+[0m[1mmodule.vpc_dev.yandex_vpc_network.create_network: Refreshing state... [id=enpp1vukb54l894fatd9][0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["1"]: Refreshing state... [id=e2le698peu4991eecu4q][0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["2"]: Refreshing state... [id=fl8seku9eh9s1teqcucd][0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["0"]: Refreshing state... [id=e9b1nitt27pud9jn8qbf][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.vpc_dev.yandex_vpc_network.create_network[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_vpc_network" "create_network" {
+      [31m-[0m[0m created_at                = "2024-12-05T16:18:55Z" [90m-> null[0m[0m
+      [31m-[0m[0m default_security_group_id = "enpcqc03k1qj28dv7t63" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id                 = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m id                        = "enpp1vukb54l894fatd9" [90m-> null[0m[0m
+      [31m-[0m[0m labels                    = {} [90m-> null[0m[0m
+      [31m-[0m[0m name                      = "jenkins-04" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_ids                = [
+          [31m-[0m[0m "e2le698peu4991eecu4q",
+          [31m-[0m[0m "e9b1nitt27pud9jn8qbf",
+          [31m-[0m[0m "fl8seku9eh9s1teqcucd",
+        ] [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # module.vpc_dev.yandex_vpc_subnet.create_subnet["0"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_vpc_subnet" "create_subnet" {
+      [31m-[0m[0m created_at     = "2024-12-05T16:18:58Z" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id      = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m id             = "e9b1nitt27pud9jn8qbf" [90m-> null[0m[0m
+      [31m-[0m[0m labels         = {} [90m-> null[0m[0m
+      [31m-[0m[0m name           = "jenkins-04-ru-central1-a" [90m-> null[0m[0m
+      [31m-[0m[0m network_id     = "enpp1vukb54l894fatd9" [90m-> null[0m[0m
+      [31m-[0m[0m v4_cidr_blocks = [
+          [31m-[0m[0m "10.0.1.0/24",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m v6_cidr_blocks = [] [90m-> null[0m[0m
+      [31m-[0m[0m zone           = "ru-central1-a" [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.vpc_dev.yandex_vpc_subnet.create_subnet["1"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_vpc_subnet" "create_subnet" {
+      [31m-[0m[0m created_at     = "2024-12-05T16:18:57Z" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id      = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m id             = "e2le698peu4991eecu4q" [90m-> null[0m[0m
+      [31m-[0m[0m labels         = {} [90m-> null[0m[0m
+      [31m-[0m[0m name           = "jenkins-04-ru-central1-b" [90m-> null[0m[0m
+      [31m-[0m[0m network_id     = "enpp1vukb54l894fatd9" [90m-> null[0m[0m
+      [31m-[0m[0m v4_cidr_blocks = [
+          [31m-[0m[0m "10.0.2.0/24",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m v6_cidr_blocks = [] [90m-> null[0m[0m
+      [31m-[0m[0m zone           = "ru-central1-b" [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.vpc_dev.yandex_vpc_subnet.create_subnet["2"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "yandex_vpc_subnet" "create_subnet" {
+      [31m-[0m[0m created_at     = "2024-12-05T16:18:58Z" [90m-> null[0m[0m
+      [31m-[0m[0m folder_id      = "b1gfoip*************" [90m-> null[0m[0m
+      [31m-[0m[0m id             = "fl8seku9eh9s1teqcucd" [90m-> null[0m[0m
+      [31m-[0m[0m labels         = {} [90m-> null[0m[0m
+      [31m-[0m[0m name           = "jenkins-04-ru-central1-d" [90m-> null[0m[0m
+      [31m-[0m[0m network_id     = "enpp1vukb54l894fatd9" [90m-> null[0m[0m
+      [31m-[0m[0m v4_cidr_blocks = [
+          [31m-[0m[0m "10.0.3.0/24",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m v6_cidr_blocks = [] [90m-> null[0m[0m
+      [31m-[0m[0m zone           = "ru-central1-d" [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 0 to change, 4 to destroy.
+[0m
+Changes to Outputs:
+  [31m-[0m[0m vpc_dev = {
+      [31m-[0m[0m network_id = "enpp1vukb54l894fatd9"
+      [31m-[0m[0m subnets    = [
+          [31m-[0m[0m {
+              [31m-[0m[0m id   = "e9b1nitt27pud9jn8qbf"
+              [31m-[0m[0m name = "jenkins-04-ru-central1-a"
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m id   = "e2le698peu4991eecu4q"
+              [31m-[0m[0m name = "jenkins-04-ru-central1-b"
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m id   = "fl8seku9eh9s1teqcucd"
+              [31m-[0m[0m name = "jenkins-04-ru-central1-d"
+            },
+        ]
+    } [90m-> null[0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["2"]: Destroying... [id=fl8seku9eh9s1teqcucd][0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["1"]: Destroying... [id=e2le698peu4991eecu4q][0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["0"]: Destroying... [id=e9b1nitt27pud9jn8qbf][0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["2"]: Destruction complete after 1s[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["1"]: Destruction complete after 2s[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_subnet.create_subnet["0"]: Destruction complete after 5s[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_network.create_network: Destroying... [id=enpp1vukb54l894fatd9][0m[0m
+[0m[1mmodule.vpc_dev.yandex_vpc_network.create_network: Destruction complete after 2s[0m
+[0m[1m[32m
+Destroy complete! Resources: 4 destroyed.
+[0m
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
