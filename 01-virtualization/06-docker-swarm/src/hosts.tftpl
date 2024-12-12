@@ -1,0 +1,25 @@
+# The function is used to permanently change the checksum of file. DON'T DELETE!
+# ${timestamp()}
+
+[managers]
+%{~ for i in docker_swarm_managers ~}
+
+${i["name"]}        ansible_host=${i["network_interface"][0]["nat_ip_address"] != "" ? i["network_interface"][0]["nat_ip_address"] : i["network_interface"][0]["ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+
+
+[managers:vars]
+ansible_ssh_user=vmshishkov
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+
+
+[workers]
+%{~ for i in docker_swarm_workers ~}
+
+${i["name"]}        ansible_host=${i["network_interface"][0]["nat_ip_address"] != "" ? i["network_interface"][0]["nat_ip_address"] : i["network_interface"][0]["ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+
+
+[workers:vars]
+ansible_ssh_user=vmshishkov
+ansible_ssh_private_key_file=~/.ssh/id_ed25519

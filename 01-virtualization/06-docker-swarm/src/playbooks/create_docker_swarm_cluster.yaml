@@ -1,0 +1,42 @@
+- name: Init Docker Swarm Cluster
+  gather_facts: false
+  hosts: managers:workers
+  become: true
+
+  pre_tasks:
+    - name: Wait for host to become reachable
+      wait_for_connection:
+
+    - name: Wait for create service 'docker.service'
+      service_facts:
+      register: result
+      until: result.ansible_facts.services['docker.service'] is defined
+      retries: 200
+      delay: 10
+
+    - name: Wait for service 'docker.service' to be running
+      service_facts:
+      register: result
+      until: result.ansible_facts.services['docker.service'].state == 'running'
+      retries: 200
+      delay: 10
+
+  tasks:
+    - name: Init a new cluster
+      docker_swarm:
+        state: present
+        advertise_addr: "{{ ansible_host }}"
+      register: cluster_result
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Get join-token for worker nodes
+      set_fact:
+        join_token_worker: "{{ hostvars[groups['managers'][0]].cluster_result.swarm_facts.JoinTokens.Worker }}"
+
+    - name: Add workes
+      docker_swarm:
+       state: join
+       join_token: "{{ join_token_worker  }}"
+       advertise_addr: "{{ ansible_host }}"
+       remote_addrs: "{{ hostvars[groups['managers'][0]].ansible_host }}:2377"
+      when: inventory_hostname not in groups['managers']

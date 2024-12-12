@@ -1,0 +1,54 @@
+#cloud-config
+datasource:
+  Ec2:
+    strict_id: false
+
+ssh_pwauth: no
+
+groups:
+  - docker
+
+users:
+  - name: ${ssh_user}
+    groups: docker
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_key}
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - unattended-upgrades
+  - python3-pip
+
+write_files:
+  - path: /etc/docker/docker.json
+    content: |
+      {
+        "registry-mirrors": [
+        "https://mirror.gcr.io",
+        "https://daocloud.io",
+        "https://c.163.com/",
+        "https://registry.docker-cn.com"
+        ]
+      }
+    owner: 'root:root'
+    permissions: '0644'
+
+runcmd:
+  - mkdir -p /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list /dev/null
+  - apt-get update
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin python3-docker
+  - systemctl enable docker
+  - systemctl restart docker
+  - pip install jsondiff
+  - pip install pexpect

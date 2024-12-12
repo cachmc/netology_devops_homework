@@ -1,0 +1,116 @@
+- name: Run Web Application
+  gather_facts: false
+  hosts: managers
+  become: true
+
+  vars:
+    - mysql_root_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61613266643436613761656133363766343339346231613465343463373836653264613333636434
+          6537353433653965653332303138316364343030363433390a653537383632666638383463366339
+          64346166373539326432393266613038623631646439663066316139363839353434356336346331
+          3736356335343264650a646362363164363865353831373866653462323939346437623036373731
+          30353030613462346333346630303934623034363333636538396239636138336432
+
+    - db_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38383466666264623936643665363163356238633165663031323364333032613563643263663961
+          3565393834656230366464376664313163336161663061390a313531393634366334356639343839
+          36646636376631643237393036653534373666336562366266386632343434663262653937646538
+          6531353734303338300a386337393536623138303833613638643132656531383230343461666636
+          3131
+
+  pre_tasks:
+    - name: Wait for host to become reachable
+      wait_for_connection:
+
+    - name: Wait for service 'docker.service' to be running
+      service_facts:
+      register: result
+      until: result.ansible_facts.services['docker.service'].state == 'running'
+      retries: 200
+      delay: 10
+
+  tasks:
+    - name: Change mode for directory /opt
+      file:
+        path: /opt
+        mode: "0777"
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Create a directory /opt/repo
+      file:
+        path: /opt/repo
+        state: directory
+        mode: '0755'
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Clone a repo with docker compose Web Application
+      git:
+        repo: https://github.com/cachmc/shvirtd-example-python.git
+        dest: /opt/repo
+        version: 01-virtualization-06-docker-swarm
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Creating ENV file mysql_compose.list.env
+      copy:
+        dest: /opt/repo/mysql_compose.list.env
+        content: |
+          MYSQL_PASSWORD={{ db_password }}
+          MYSQL_ROOT_PASSWORD={{ mysql_root_password }}
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Creating ENV file web_compose.list.env
+      copy:
+        dest: /opt/repo/web_compose.list.env
+        content: |
+          DB_PASSWORD={{ db_password }}
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Build Web Application image
+      docker_image:
+        build:
+          path: /opt/repo
+        name: web_app_py
+        tag: 1.0.0
+        source: build
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Remove default ingress network
+      expect:
+        command: docker network rm ingress
+        responses:
+          "[y/N]": "y"
+      when: inventory_hostname == groups['managers'][0]
+      ignore_errors: true
+
+    - name: Create ingress network
+      shell: "docker network create --scope=swarm --ingress -d overlay ingress"
+      when: inventory_hostname == groups['managers'][0]
+      ignore_errors: true
+
+    - name: Deploy stack web_app
+      docker_stack:
+        state: present
+        name: web_app
+        compose:
+          - /opt/repo/compose.yaml
+      when: inventory_hostname == groups['managers'][0]
+
+    - name: Wait until HTTP status is 200
+      uri:
+        url: "http://{{ hostvars[inventory_hostname]['ansible_host'] }}:8080"
+        return_content: yes
+        validate_certs: no
+        status_code:
+          - 200
+      until: uri_output.status == 200
+      retries: 24
+      delay: 10
+      when: inventory_hostname == groups['managers'][0]
+      register: uri_output
+
+    - name: Show result HTTP response
+      debug:
+        var: uri_output.content
+      when: inventory_hostname == groups['managers'][0]
