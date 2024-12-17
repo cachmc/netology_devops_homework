@@ -18,7 +18,7 @@
 
 ![Скриншот 8](https://github.com/cachmc/netology_devops_homework/raw/main/04-ci/06-gitlab/pictures/task-01-07.png)
 
-![Скриншот 9](https://github.com/cachmc/netology_devops_homework/raw/main/04-ci/06-gitlab/pictures/task-01-08png)
+![Скриншот 9](https://github.com/cachmc/netology_devops_homework/raw/main/04-ci/06-gitlab/pictures/task-01-08.png)
 
 <br>
 <br>
