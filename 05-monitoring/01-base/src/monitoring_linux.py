@@ -66,6 +66,7 @@ if len(uptime) > 0:
    parse_uptime = uptime[0].split(" ")
    metrics_json['uptime_s'] = int(float(parse_uptime[0]))
 
+### Write to file
 formatted_date = datetime.today().strftime("%y-%m-%d")
 with open(path_metrics_log+"/"+formatted_date+"-awesome-monitoring.log", 'a') as file:
     file.write(json.dumps(metrics_json) + '\n')
