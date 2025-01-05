@@ -13,35 +13,43 @@
 
 ![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-00.png)
 
-![Скриншот 4](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-01.png)
+<br>
 
 ```promql
 node_memory_MemFree_bytes{instance="${instance}"}
 
 ```
 
-![Скриншот 5](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-02.png)
+![Скриншот 4](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-01.png)
+
+<br>
 
 ```promql
 node_filesystem_size_bytes{instance="${instance}"}
 
 ```
 
-![Скриншот 6](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-03.png)
+![Скриншот 5](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-02.png)
+
+<br>
 
 ```promql
 100 - avg(rate(node_cpu_seconds_total{instance="${instance}", mode="idle"}[30s])) * 100
 
 ```
 
-![Скриншот 7](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-04.png)
+![Скриншот 6](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-03.png)
+
+<br>
 
 ```promql
 avg(sum(rate(node_cpu_seconds_total{instance="${instance}", mode!="idle"}[1m])) without (mode)) * 100
 
 ```
 
-![Скриншот 8](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-05.png)
+![Скриншот 7](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-04.png)
+
+<br>
 
 ```promql
 avg(sum(rate(node_cpu_seconds_total{instance="${instance}", mode!="idle"}[5m])) without (mode)) * 100
@@ -52,6 +60,8 @@ avg(sum(rate(node_cpu_seconds_total{instance="${instance}", mode!="idle"}[5m])) 
 avg(sum(rate(node_cpu_seconds_total{instance="${instance}", mode!="idle"}[15m])) without (mode)) * 100
 
 ```
+
+![Скриншот 8](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/02-grafana/pictures/task-02-05.png)
 
 <br>
 <br>
