@@ -13,17 +13,19 @@
 
 ![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/03-elk/pictures/task-02-00.png)
 
-![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/03-elk/pictures/task-02-01.png)
+![Скриншот 4](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/03-elk/pictures/task-02-01.png)
 
-![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/03-elk/pictures/task-02-02.png)
+![Скриншот 5](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/03-elk/pictures/task-02-02.png)
+
+![Скриншот 6](https://github.com/cachmc/netology_devops_homework/raw/main/05-monitoring/03-elk/pictures/task-02-03.png)
 
 <br>
 <br>
 
-## [Docker compose](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/02-grafana/src/compose.yaml)
+## [Docker compose](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/03-elk/src/compose.yaml)
 
-## [Logstash config](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/02-grafana/src/logstash.conf)
+## [Logstash config](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/03-elk/src/logstash.conf)
 
-## [Filebeat config](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/02-grafana/src/filebeat.yml)
+## [Filebeat config](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/03-elk/src/filebeat.yml)
 
-## [Log generator](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/02-grafana/src/log-generator-app.py)
+## [Log generator](https://github.com/cachmc/netology_devops_homework/tree/main/05-monitoring/03-elk/src/log-generator-app.py)
