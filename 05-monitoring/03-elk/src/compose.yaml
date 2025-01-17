@@ -1,0 +1,185 @@
+services:
+  es-node-01:
+    container_name: ${PROJECT}_es-node-01
+    image: elasticsearch:${STACK_VERSION}
+    hostname: ${PROJECT}_es-node-01
+    volumes:
+      - es-data-01:/usr/share/elasticsearch/data
+    networks:
+      elk-network:
+        ipv4_address: 172.20.0.10
+    ports:
+      - 9200:9200
+    environment:
+      - node.name=es-node-01
+      - cluster.name=${PROJECT}_elk-cluster
+      - cluster.initial_master_nodes=es-node-01,es-node-02
+      - discovery.seed_hosts=es-node-01,es-node-02
+      - node.roles=master,data_hot,data_content
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:9200 | grep -q 'HTTP/1.1 200 OK'",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 120
+
+  es-node-02:
+    depends_on:
+      - es-node-01
+    container_name: ${PROJECT}_es-node-02
+    image: elasticsearch:${STACK_VERSION}
+    hostname: ${PROJECT}_es-node-02
+    volumes:
+      - es-data-02:/usr/share/elasticsearch/data
+    networks:
+      elk-network:
+        ipv4_address: 172.20.0.15
+    environment:
+      - node.name=es-node-02
+      - cluster.name=${PROJECT}_elk-cluster
+      - cluster.initial_master_nodes=es-node-01,es-node-02
+      - discovery.seed_hosts=es-node-01,es-node-02
+      - node.roles=master,data_warm
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:9200 | grep -q 'HTTP/1.1 200 OK'",
+        ]
+      interval: 1s
+      timeout: 1s
+      retries: 120
+
+  kibana:
+    depends_on:
+      es-node-01:
+        condition: service_healthy
+      es-node-02:
+        condition: service_healthy
+    container_name: ${PROJECT}_kibana
+    image: kibana:${STACK_VERSION}
+    hostname: ${PROJECT}_kibana
+    volumes:
+      - kibana-data:/usr/share/kibana/data
+    networks:
+      elk-network:
+        ipv4_address: 172.20.0.5
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://es-node-01:9200
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 1s
+      timeout: 1s
+      retries: 120
+
+  logstash:
+    depends_on:
+      es-node-01:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    container_name: ${PROJECT}_logstash
+    image: logstash:${STACK_VERSION}
+    hostname: ${PROJECT}_logstash
+    volumes:
+      - logstash-data:/usr/share/logstash/data
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    networks:
+      elk-network:
+        ipv4_address: 172.20.0.20
+    ports:
+      - 5044:5044
+      - 9600:9600
+    environment:
+      - ELASTIC_HOSTS=http://es-node-01:9200
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:9600 | grep -q 'HTTP/1.1 200 OK'",
+        ]
+      interval: 1s
+      timeout: 1s
+      retries: 120
+
+  filebeat:
+    depends_on:
+      logstash:
+        condition: service_healthy
+    container_name: ${PROJECT}_filebeat
+    image: elastic/filebeat:${STACK_VERSION}
+    hostname: ${PROJECT}_filebeat
+    user: root
+    volumes:
+      - filebeat-data:/usr/share/filebeat/data
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+    networks:
+      elk-network:
+        ipv4_address: 172.20.0.25
+    environment:
+      - LOGSTASH_HOSTS=logstash:5044
+    command:
+      - --strict.perms=false
+
+  log-generator-app:
+    depends_on:
+      filebeat:
+        condition: service_started
+    image: library/python:3.9-alpine
+    container_name: ${PROJECT}_log-generator-app
+    hostname: ${PROJECT}_log-generator-app
+    volumes:
+      - ./log-generator-app.py:/opt/log-generator-app.py:Z
+    networks:
+      elk-network:
+        ipv4_address: 172.20.0.30
+    entrypoint: python3 -u /opt/log-generator-app.py
+
+volumes:
+  es-data-01:
+    name: ${PROJECT}_es-data-01
+    driver: local
+  es-data-02:
+    name: ${PROJECT}_es-data-02
+    driver: local
+  kibana-data:
+    name: ${PROJECT}_kibana-data
+    driver: local
+  logstash-data:
+    name: ${PROJECT}_logstash-data
+    driver: local
+  filebeat-data:
+    name: ${PROJECT}_filebeat-data
+    driver: local
+
+networks:
+  elk-network:
+    name: ${PROJECT}_elk-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
