@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  http-application
+  namespace: default
+  labels:
+    app:  http-application
+spec:
+  selector:
+    matchLabels:
+      app: http-application
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app:  http-application
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - name: http
+              containerPort: 80
+        - name: multitool
+          image: wbitt/network-multitool
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8083
+          env:
+          - name: HTTP_PORT
+            value: "8080"
+          - name: HTTPS_PORT
+            value: "8083"
