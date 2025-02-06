@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  http-application
+  name: http-application
   namespace: default
   labels:
-    app:  http-application
+    app: http-application
 spec:
   selector:
     matchLabels:
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        app:  http-application
+        app: http-application
     spec:
       containers:
         - name: nginx
