@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor-log
+  namespace: default
+  labels:
+    app: monitor-log
+spec:
+  selector:
+    matchLabels:
+      app: monitor-log
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: monitor-log
+    spec:
+      containers:
+        - name: multitool
+          image: wbitt/network-multitool
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "1"
+          ports:
+            - name: multitool-http
+              containerPort: 80
+            - name: multitool-https
+              containerPort: 443
+          volumeMounts:
+            - name: share-dir
+              mountPath: /mnt/share-dir
+      volumes:
+        - name: share-dir
+          persistentVolumeClaim:
+            claimName: pvc-monitor-log
