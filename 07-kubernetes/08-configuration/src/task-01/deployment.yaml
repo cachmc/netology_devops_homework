@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-application
+  namespace: default
+  labels:
+    app: http-application
+spec:
+  selector:
+    matchLabels:
+      app: http-application
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: http-application
+    spec:
+      volumes:
+        - name: vol-nginx
+          configMap:
+            name: configmap-nginx
+      containers:
+        - name: nginx
+          image: nginx:latest
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "1"
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: vol-nginx
+              mountPath: /usr/share/nginx/html
+        - name: multitool
+          image: wbitt/network-multitool
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "1"
+          env:
+            - name: HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap-multitool
+                  key: port_http
+            - name: HTTPS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap-multitool
+                  key: port_https
