@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-application
+  namespace: default
+  labels:
+    app: http-application
+spec:
+  selector:
+    matchLabels:
+      app: http-application
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: http-application
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "1"
+          ports:
+            - name: http
+              containerPort: 80
