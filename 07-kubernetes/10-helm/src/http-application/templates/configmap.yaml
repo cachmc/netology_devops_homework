@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-app-{{ .Values.versionApp }}
+  namespace: {{  .Values.namespace }}
+data:
+  index.html: |-
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Demo page</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                color: #333;
+            }
+            h1 {
+                color: #0066cc;
+            }
+            p {
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Web Server Nginx</h1>
+        <p>You are welcome!</p>
+        <p>Application version: {{ .Values.versionApp }}</p>
+        <p>Core version: {{ .Values.versionImage }}</p>
+    </body>
+    </html>

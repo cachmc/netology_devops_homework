@@ -1,0 +1,12 @@
+namespace: app1
+versionApp: 1
+versionImage: 1.0.0
+secret:
+  tls:
+    crt: #must be coded in base64 format
+    key: #must be coded in base64 format
+service:
+  clusterIpPort: 9000
+resources:
+  memory: 256Mi
+  cpu: 1

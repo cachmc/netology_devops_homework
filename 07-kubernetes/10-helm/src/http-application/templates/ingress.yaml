@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-tls-app-{{ .Values.versionApp }}
+  namespace: {{  .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  tls:
+    - hosts:
+        - web.server.nginx
+      secretName: tls-certificate-app-{{ .Values.versionApp }}
+  rules:
+    - host: web.server.nginx
+      http:
+        paths:
+          - path: /app{{ .Values.versionApp }}
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-app-{{ .Values.versionApp }}
+                port:
+                  number: {{ .Values.service.clusterIpPort }}

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-app-{{ .Values.versionApp }}
+  namespace: {{  .Values.namespace }}
+  labels:
+    app: http-application
+spec:
+  type: ClusterIP
+  selector:
+    app: http-application-app-{{ .Values.versionApp }}
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.service.clusterIpPort }}
+      targetPort: 80
