@@ -55,7 +55,7 @@
 
 ![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/07-kubernetes/10-helm/pictures/task-02-02.png)
 
-![Скриншот 3](https://github.com/cachmc/netology_devops_homework/raw/main/07-kubernetes/10-helm/pictures/task-02-03.png)
+![Скриншот 4](https://github.com/cachmc/netology_devops_homework/raw/main/07-kubernetes/10-helm/pictures/task-02-03.png)
 
 <br>
 
