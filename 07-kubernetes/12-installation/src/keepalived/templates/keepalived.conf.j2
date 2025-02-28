@@ -1,0 +1,32 @@
+global_defs {
+    enable_script_security
+    script_user nobody
+}
+
+kvrrp_script check_k8s_api {
+        script "curl https://127.0.0.1:6443 -k"
+        interval 3
+        weight 100
+}
+
+vrrp_instance VIP_k8s_api {
+        interface eth0
+        state BACKUP
+        virtual_router_id 1
+        priority 100
+        advert_int 1
+        nopreempt
+        unicast_src_ip {{ hostvars[inventory_hostname].ip }}
+        unicast_peer {
+{% for i in groups[group_names[0]] %}
+                {{ hostvars[i]['ip'] }}
+{% endfor %}
+        }
+        virtual_ipaddress {
+                10.0.1.250
+        }
+        track_script {
+                check_k8s_api
+        }
+}
+

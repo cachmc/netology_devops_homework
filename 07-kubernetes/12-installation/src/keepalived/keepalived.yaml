@@ -1,0 +1,69 @@
+- name: Settings keepalived
+  hosts: kube_control_plane
+  gather_facts: false
+  become: yes
+
+  handlers:
+    - name: Restart service
+      ansible.builtin.systemd:
+        name: keepalived
+        state: restarted
+      listen: keepalived_restart
+
+  tasks:
+    - name: Install keepalived
+      ansible.builtin.apt:
+        name: keepalived
+        state: present
+
+    - name: Copy keepalived.conf in /etc/keepalived/
+      ansible.builtin.template:
+        src: keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        mode: 0664
+      notify: keepalived_restart
+
+    - name: Start service
+      ansible.builtin.systemd:
+        name: keepalived
+        state: started
+
+    - name: Enable service      
+      ansible.builtin.systemd:
+        name: keepalived                     
+        enabled: true
+
+- name: Settings nginx proxy
+  hosts: keepalived_node
+  gather_facts: false
+  become: yes
+
+  handlers:
+    - name: Restart service
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+      listen: nginx_restart
+
+  tasks:
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Copy nginx.conf in /etc/nginx
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        mode: 0664
+      notify: nginx_restart
+
+    - name: Start service
+      ansible.builtin.systemd:
+        name: nginx
+        state: started
+
+    - name: Enable service
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true
