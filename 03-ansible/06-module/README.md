@@ -237,7 +237,7 @@ if __name__ == '__main__':
 
 <br>
 
-### [Ansible Collection Yandex Cloud ELK 1.0.0](https://github.com/cachmc/ansible-collection-yandex_cloud_elk/tree/1.0.0)
+### [Ansible Collection Yandex Cloud ELK 1.0.0](https://github.com/cachmc/cachmc-ansible-collection-yandex_cloud_elk/tree/1.0.0)
 
 ### [Collection 1.0.0 archive](https://github.com/cachmc/netology_devops_homework/tree/main/03-ansible/06-module/src/cachmc-yandex_cloud_elk-1.0.0.tar.gz)
 
@@ -272,7 +272,7 @@ ansible-playbook -i inventory/inventory.yaml vector_lighthouse.yaml -e "vector_c
 <br>
 <br>
 
-### [Ansible Collection Yandex Cloud ELK 2.0.0](https://github.com/cachmc/ansible-collection-yandex_cloud_elk/tree/2.0.0)
+### [Ansible Collection Yandex Cloud ELK 2.0.0](https://github.com/cachmc/cachmc-ansible-collection-yandex_cloud_elk/tree/2.0.0)
 
 ### [Collection 2.0.0 archive](https://github.com/cachmc/netology_devops_homework/tree/main/03-ansible/06-module/src/cachmc-yandex_cloud_elk-2.0.0.tar.gz)
 
