@@ -1,0 +1,9 @@
+- name: Test module 'create_file'
+  gather_facts: false
+  hosts: localhost
+  tasks:
+    - name: Create file
+      cachmc.yandex_cloud_elk.create_file:
+        path: /tmp/new_file.txt
+        content: |
+          Hello, Netology!

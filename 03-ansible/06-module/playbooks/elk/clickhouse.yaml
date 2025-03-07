@@ -1,0 +1,99 @@
+---
+### ClickHouse
+- name: Install ClickHouse
+  hosts: clickhouse
+  gather_facts: false
+
+  collections:
+    - cachmc.yandex_cloud_elk
+
+  vars:
+    ansible_pkg_mgr: "yum"
+
+  pre_tasks:
+    - name: Create host
+      compute_instance_create:
+        iam_token: "{{ yc_iam_token }}"
+        folder_id: "{{ yc_folder_id }}"
+        name: "{{ hostname }}"
+        image:
+          family: "centos-stream-9-oslogin"
+        resources:
+          cores: 4
+          memory: 4294967296
+          disk:
+            size: 21474836480
+          network:
+            subnet_id: "e9bitlboc66heiqr1vgk"
+        ssh_user: "vmshishkov"
+        ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLskaY3H39j5ZSdodVRfmvBntSaVyiieWnKOyNnRh"
+      delegate_to: localhost
+      register: create_compute_instance
+
+    - set_fact:
+        ansible_host: "{{ create_compute_instance.external_ip_address }}"
+        clickhouse_listen_host:
+          - "localhost"
+          - "127.0.0.1"
+          - "{{ create_compute_instance.local_ip_address }}"
+        cacheable: yes
+
+    - name: Wait for host to become reachable
+      wait_for_connection:
+
+    - gather_facts:
+
+    - name: Create group 'clickhouse'
+      become: true
+      ansible.builtin.group:
+        name: clickhouse
+        state: present
+
+    - name: Create user 'clickhouse'
+      become: true
+      ansible.builtin.user:
+        name: clickhouse
+        group: clickhouse
+        create_home: true
+        expires: -1
+
+    - name: Create directory '/run/clickhouse-server'
+      become: true
+      ansible.builtin.file:
+        name: /run/clickhouse-server
+        owner: clickhouse
+        group: clickhouse
+        state: directory
+
+  roles:
+    - role: clickhouse
+
+  post_tasks:
+    - name: Gather list of existing tables
+      ansible.builtin.command: "clickhouse-client -q 'SHOW TABLES FROM {{ item.name }};'"
+      changed_when: false
+      with_items: "{{ clickhouse_dbs_custom }}"
+      register: existing_tables
+
+    - name: Show existing tables
+      debug:
+        msg: |
+          {% for table in existing_tables.results %}
+          {% if item.name == table.item.name %}
+          {{ table.stdout_lines }}
+          {% endif %}
+          {% endfor %}
+      with_items: "{{ clickhouse_dbs_custom }}"
+
+    - name: Create table
+      ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS \
+                               {{ item.item.name }}.{{ clickhouse_table_name }} (message String) \
+                               ENGINE = MergeTree() ORDER BY tuple();'"
+      when: clickhouse_table_name not in item.stdout_lines
+      with_items: "{{ existing_tables.results }}"
+
+    - name: Show IPs
+      ansible.builtin.debug:
+        msg:
+          local_ip: "{{ create_compute_instance.local_ip_address }}"
+          external_ip: "{{ create_compute_instance.external_ip_address }}"

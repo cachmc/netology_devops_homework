@@ -1,0 +1,131 @@
+---
+### Vector
+- name: Install Vector
+  hosts: vector
+  gather_facts: false
+
+  collections:
+    - cachmc.yandex_cloud_elk
+
+  pre_tasks:
+    - name: Create host
+      cachmc.yandex_cloud_elk.compute_instance_create:
+        iam_token: "{{ yc_iam_token }}"
+        folder_id: "{{ yc_folder_id }}"
+        name: "{{ hostname }}"
+        image:
+          family: "centos-stream-9-oslogin"
+        resources:
+          network:
+            subnet_id: "e9bitlboc66heiqr1vgk"
+        ssh_user: "vmshishkov"
+        ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLskaY3H39j5ZSdodVRfmvBntSaVyiieWnKOyNnRh"
+      delegate_to: localhost
+      register: create_compute_instance
+
+    - set_fact:
+        ansible_host: "{{ create_compute_instance.external_ip_address }}"
+        cacheable: yes
+
+    - name: Wait for host to become reachable
+      wait_for_connection:
+
+    - gather_facts:
+
+  roles:
+    - role: vector
+  
+  post_tasks:
+    - name: Show IPs
+      ansible.builtin.debug:
+        msg:
+          local_ip: "{{ create_compute_instance.local_ip_address }}"
+          external_ip: "{{ create_compute_instance.external_ip_address }}"
+
+### LightHouse
+- name: Install LightHouse
+  hosts: lighthouse
+  gather_facts: false
+
+  collections:
+    - cachmc.yandex_cloud_elk
+
+  handlers:
+    - name: Reload nginx service
+      become: true
+      ansible.builtin.command: "/usr/sbin/nginx -s reload"
+      register: reload_nginx
+      failed_when: reload_nginx.rc != 0
+      changed_when: reload_nginx.rc == 0
+      listen: nginx_reload
+
+    - name: Start nginx service
+      become: true
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+      listen: nginx_start
+
+  pre_tasks:
+    - name: Create host
+      cachmc.yandex_cloud_elk.compute_instance_create:
+        iam_token: "{{ yc_iam_token }}"
+        folder_id: "{{ yc_folder_id }}"
+        name: "{{ hostname }}"
+        image:
+          family: "centos-stream-9-oslogin"
+        resources:
+          network:
+            subnet_id: "e9bitlboc66heiqr1vgk"
+        ssh_user: "vmshishkov"
+        ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL3oLskaY3H39j5ZSdodVRfmvBntSaVyiieWnKOyNnRh"
+      delegate_to: localhost
+      register: create_compute_instance
+
+    - set_fact:
+        ansible_host: "{{ create_compute_instance.external_ip_address }}"
+        cacheable: yes
+
+    - name: Wait for host to become reachable
+      wait_for_connection:
+
+    - gather_facts:
+
+  tasks:
+    - name: "Include lighthouse"
+      include_role:
+        name: "lighthouse"
+
+  post_tasks:
+    - name: Install nginx package
+      become: true
+      ansible.builtin.yum:
+        name: nginx
+      notify: nginx_start
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Copy config file nginx.conf
+      become: true
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "/etc/nginx/{{ item.dest }}"
+        mode: "{{ item.mode }}"
+        backup: true
+      with_items:
+        - { src: './templates/nginx.conf.j2', dest: 'nginx.conf', mode: '0644' }
+        - { src: './templates/nginx_lighthouse.conf.j2', dest: 'conf.d/lighthouse.conf', mode: '0644' }
+      notify: nginx_reload
+
+    - name: Enable nginx service
+      become: true
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true
+
+    - name: Show IPs
+      ansible.builtin.debug:
+        msg:
+          local_ip: "{{ create_compute_instance.local_ip_address }}"
+          external_ip: "{{ create_compute_instance.external_ip_address }}"

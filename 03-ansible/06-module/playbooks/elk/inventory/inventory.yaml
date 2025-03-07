@@ -1,0 +1,14 @@
+clickhouse:
+  hosts:
+    elk-clickhouse-01:
+      hostname: elk-clickhouse-01
+
+vector:
+  hosts:
+    elk-vector-01:
+      hostname: elk-vector-01
+
+lighthouse:
+  hosts:
+    elk-lighthouse-01:
+      hostname: elk-lighthouse-01
