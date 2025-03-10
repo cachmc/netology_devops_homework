@@ -93,9 +93,6 @@
 
 <br>
 
-
-<br>
-
 ## Настройка кластера K8s
 
 *K8s* кластер настраивается при помощи *Kubespray*. Предварительно изменены значения несколько переменных *playbook'а* в файле `./inventory/netology/group_vars/k8s_cluster/addons.yml`
@@ -117,6 +114,8 @@ ingress_nginx_host_network: true
 ![Скриншот 20](https://github.com/cachmc/netology_devops_homework/raw/main/07-kubernetes/12-installation/pictures/task-02-02.png)
 
 </details>
+
+<br>
 
 ## Настройка Keepalived и Nginx Proxy
 
@@ -151,6 +150,8 @@ kubeadm init phase upload-config kubeadm --config kubeadm.yaml
 
 </details>
 
+<br>
+
 ## P.S.
 
 В идеале, чтобы уменьшить расходы на содержание кластера, нужно было поднять инфрастуктуры с одним внешним *IP* на *Nginx Proxy* (*develop-k8s-keepalived-1*).
@@ -184,7 +185,7 @@ kubectl -n kube-system get configmap kubeadm-config -o jsonpath='{.data.ClusterC
 nano kubeadm.yaml
 mv /etc/kubernetes/pki/apiserver.{crt,key} ~
 kubeadm init phase certs apiserver --config kubeadm.yaml
-лшдд -9 <kube-apiserver>
+kill -9 <kube-apiserver>
 kubeadm init phase upload-config kubeadm --config kubeadm.yaml
 ```
 
