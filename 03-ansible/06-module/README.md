@@ -237,7 +237,7 @@ if __name__ == '__main__':
 
 <br>
 
-### [Ansible Collection Yandex Cloud ELK 1.0.0](https://github.com/cachmc/ansible-collection-yandex_cloud_elk/tree/1.0.0)
+### [Ansible Collection Yandex Cloud ELK 1.0.0](https://github.com/cachmc/cachmc-ansible-collection-yandex_cloud_elk/tree/1.0.0)
 
 ### [Collection 1.0.0 archive](https://github.com/cachmc/netology_devops_homework/tree/main/03-ansible/06-module/src/cachmc-yandex_cloud_elk-1.0.0.tar.gz)
 
@@ -250,7 +250,7 @@ if __name__ == '__main__':
 
 ![Скриншот 6](https://github.com/cachmc/netology_devops_homework/raw/main/03-ansible/06-module/pictures/optional/task-01-01.png)
 
-![Скриншот 7](https://github.com/cachmc/netology_devops_homework/raw/main/03-ansible/06-module/pictures/optional/task-01-02.png)
+![Скриншот 7](https://raw.githubusercontent.com/cachmc/netology_devops_homework/refs/heads/main/03-ansible/06-module/pictures/optional/task-01-02.png)
 
 ![Скриншот 8](https://github.com/cachmc/netology_devops_homework/raw/main/03-ansible/06-module/pictures/optional/task-01-03.png)
 
@@ -266,13 +266,13 @@ ansible-galaxy collection install cachmc-yandex_cloud_elk-2.0.0.tar.gz
 pip install -r requirements/requirements.txt
 
 ansible-playbook -i inventory/inventory.yaml clickhouse.yaml
-ansible-playbook -i inventory/inventory.yaml vector_lighthouse.yaml -e "vector_ch_address=<clickhouse_local_ip_address> lighthouse_ch+address=<clickhouse_local_ip_address>"
+ansible-playbook -i inventory/inventory.yaml vector_lighthouse.yaml -e "vector_ch_address=<clickhouse_local_ip_address> lighthouse_ch_address=<clickhouse_local_ip_address>"
 ```
 
 <br>
 <br>
 
-### [Ansible Collection Yandex Cloud ELK 2.0.0](https://github.com/cachmc/ansible-collection-yandex_cloud_elk/tree/2.0.0)
+### [Ansible Collection Yandex Cloud ELK 2.0.0](https://github.com/cachmc/cachmc-ansible-collection-yandex_cloud_elk/tree/2.0.0)
 
 ### [Collection 2.0.0 archive](https://github.com/cachmc/netology_devops_homework/tree/main/03-ansible/06-module/src/cachmc-yandex_cloud_elk-2.0.0.tar.gz)
 
