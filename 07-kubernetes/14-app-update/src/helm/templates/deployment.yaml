@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-application
+  namespace: default
+  labels:
+    app: http-application
+  annotations:
+    kubernetes.io/change-cause: "Nginx version {{  .Values.nginx_version }}"
+spec:
+  selector:
+    matchLabels:
+      app: http-application
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0%
+  template:
+    metadata:
+      labels:
+        app: http-application
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:{{  .Values.nginx_version }}
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - name: http
+              containerPort: 80
+        - name: multitool
+          image: wbitt/network-multitool
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8083
+          env:
+            - name: HTTP_PORT
+              value: "8080"
+            - name: HTTPS_PORT
+              value: "8083"

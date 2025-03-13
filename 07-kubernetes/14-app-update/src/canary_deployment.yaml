@@ -1,0 +1,218 @@
+#####################################################################################
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-app-nginx-v1
+  namespace: default
+data:
+  index.html: |-
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Demo page</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                color: #333;
+            }
+            h1 {
+                color: #0066cc;
+            }
+            p {
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Web Server Nginx</h1>
+        <p>You are welcome!</p>
+        <p>Nginx version: 1.19</p>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-app-nginx-v1
+  namespace: default
+  labels:
+    app: nginx-v1
+spec:
+  selector:
+    matchLabels:
+      app: nginx-v1
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx-v1
+    spec:
+      volumes:
+        - name: vol-nginx-v1
+          configMap:
+            name: configmap-app-nginx-v1
+      containers:
+        - name: nginx
+          image: nginx:1.19
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: vol-nginx-v1
+              mountPath: /usr/share/nginx/html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-app-nginx-v1
+  namespace: default
+  labels:
+    app: nginx-v1
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx-v1
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 80
+      
+#####################################################################################
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-app-nginx-v2
+  namespace: default
+data:
+  index.html: |-
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Demo page</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                color: #333;
+            }
+            h1 {
+                color: #0066cc;
+            }
+            p {
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Web Server Nginx</h1>
+        <p>You are welcome!</p>
+        <p>Nginx version: 1.20</p>
+    </body>
+    </html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-app-nginx-v2
+  namespace: default
+  labels:
+    app: nginx-v2
+spec:
+  selector:
+    matchLabels:
+      app: nginx-v2
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx-v2
+    spec:
+      volumes:
+        - name: vol-nginx-v2
+          configMap:
+            name: configmap-app-nginx-v2
+      containers:
+        - name: nginx
+          image: nginx:1.20
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: vol-nginx-v2
+              mountPath: /usr/share/nginx/html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-app-nginx-v2
+  namespace: default
+  labels:
+    app: nginx-v2
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx-v2
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 80
+
+#####################################################################################
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-app-nginx-v1
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: web.server.nginx
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-app-nginx-v1
+            port:
+              number: 8080
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-app-nginx-v2
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "30"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: web.server.nginx
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-app-nginx-v2
+            port:
+              number: 8080
