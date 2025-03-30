@@ -2,7 +2,7 @@ data "yandex_compute_image" "nat_get_image" {
   family = var.nat_instance.disk_image_family_id
 }
 
-resource "yandex_compute_instance" "nat_create_instance" {
+resource "yandex_compute_instance" "create_nat_instance" {
   name                      = var.nat_instance.name
   platform_id               = var.nat_instance.platform_id
   hostname                  = var.nat_instance.name
