@@ -1,0 +1,31 @@
+#cloud-config
+datasource:
+  Ec2:
+    strict_id: false
+
+ssh_pwauth: no
+
+users:
+  - name: ${ssh_user}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+       - ${ssh_key}
+
+write_files:
+  - content: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+      <title>S3 Bucket</title>
+      </head>
+      <body>
+      <h1>Pictures</h1>
+      %{~ for i in urls_pub_files ~}
+      <p><a href="${i.url}">${i.name}</a></p>
+      %{~ endfor ~}
+      </body>
+      </html>
+    path: /var/www/html/index.html
+    owner: root:root
+    permissions: '0644'
