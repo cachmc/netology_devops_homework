@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>S3 Bucket</title>
+</head>
+<body>
+<h1>Pictures</h1>
+%{~ for i in urls_pub_files ~}
+  %{~ if strcontains(i.name, "pictures/") ~}
+
+<p><a href="${url}/${i.name}">${i.name}</a></p>
+  %{~ endif ~}
+%{~ endfor ~}
+</body>
+</html>
