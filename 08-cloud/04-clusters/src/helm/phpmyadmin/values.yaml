@@ -1,0 +1,8 @@
+name: phpmyadmin
+namespace: default
+versionImage: latest
+replicas: 3
+loadBalancerPort: 80
+db:
+  host: <ip_or_fqdn_mysql_server>
+  port: 3306
