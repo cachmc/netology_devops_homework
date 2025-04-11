@@ -1,0 +1,29 @@
+sources:
+  log_containers:
+    type: docker_logs
+    include_containers:
+      - gateway
+      - security
+      - uploader
+      - storage
+
+transforms:
+  transform_logs:
+    inputs:
+      - log_containers
+    type: remap
+    source: |-
+      ."project" = "microservices"
+      . = map_keys(., recursive: true) -> |key| { replace(key, ".", "_") }
+
+sinks:
+  send_elasticsearch:
+    type: elasticsearch
+    inputs: 
+      - transform_logs
+    endpoints: 
+      - ${ELASTIC_HOSTS}
+    doc_type: _doc
+    bulk:
+      action: index
+      index: microservices-project-%Y-%m-%d
