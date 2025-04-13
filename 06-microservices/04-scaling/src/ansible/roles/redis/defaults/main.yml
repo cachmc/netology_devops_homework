@@ -1,0 +1,3 @@
+---
+redis_master_port: 7000
+redis_slave_port: 7001

@@ -1,0 +1,10 @@
+- name: Create Redis Cluster
+  hosts: all
+  gather_facts: false
+
+  pre_tasks:
+    - name: Wait for host to become reachable
+      wait_for_connection:
+
+  roles:
+    - role: redis

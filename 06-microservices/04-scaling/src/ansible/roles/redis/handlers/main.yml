@@ -1,0 +1,42 @@
+---
+- name: Start master redis service
+  become: true
+  ansible.builtin.service:
+    name: redis_master
+    state: started
+  listen: start_redis_master
+
+- name: Restart master redis service
+  become: true
+  ansible.builtin.service:
+    name: redis_master
+    state: restarted
+  listen: restart_redis_master
+
+- name: Enable master redis service
+  become: true
+  ansible.builtin.service:
+    name: redis_master
+    enabled: true
+  listen: enable_redis_master
+
+- name: Start slave redis service
+  become: true
+  ansible.builtin.service:
+    name: redis_slave
+    state: started
+  listen: start_redis_slave
+
+- name: Restart slave redis service
+  become: true
+  ansible.builtin.service:
+    name: redis_slave
+    state: restarted
+  listen: restart_redis_slave
+
+- name: Enable slave redis service
+  become: true
+  ansible.builtin.service:
+    name: redis_slave
+    enabled: true
+  listen: enable_redis_slave

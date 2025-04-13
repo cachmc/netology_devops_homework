@@ -1,0 +1,10 @@
+port {{ redis_slave_port }}
+dir /var/lib/redis/slave
+appendonly no
+protected-mode no
+cluster-enabled yes
+cluster-node-timeout 5000
+cluster-config-file /etc/redis/cluster/slave/nodes_slave.conf
+pidfile /var/run/redis/redis_slave.pid
+logfile /var/log/redis/redis_slave.log
+loglevel notice

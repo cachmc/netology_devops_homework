@@ -1,0 +1,123 @@
+---
+- name: Install Redis
+  become: true
+  tags: redis
+  ansible.builtin.apt:
+    name: redis-server
+    state: present
+    update_cache: true
+
+- name: Stop and disable default redis service
+  become: true
+  tags: redis
+  ansible.builtin.service:
+    name: redis-server
+    state: stopped
+    enabled: false
+
+- name: Create directories
+  become: true
+  tags: redis
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: directory
+    owner: redis
+    group: redis
+    mode: '{{ item.mode }}'
+  loop:
+    - { path: '/etc/redis/cluster', mode: '0755' }
+    - { path: '/etc/redis/cluster/master', mode: '0755' }
+    - { path: '/etc/redis/cluster/slave', mode: '0755' }
+    - { path: '/var/lib/redis/master', mode: '0770' }
+    - { path: '/var/lib/redis/slave', mode: '0770' }
+
+- name: Copy config files for master nodes
+  become: true
+  tags: redis
+  ansible.builtin.template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: '{{ item.owner }}'
+    group: '{{ item.group }}'
+    mode: '{{ item.mode }}'
+    backup: true
+  loop:
+    - { src: 'redis_master.conf.j2', dest: '/etc/redis/cluster/master/redis_master.conf', owner: 'redis', group: 'redis', mode: '0640' }
+    - { src: 'redis_master.service.j2', dest: '/etc/systemd/system/redis_master.service', owner: 'root', group: 'root', mode: '0640' }
+  notify:
+    - restart_redis_master
+    - enable_redis_master
+
+- name: Copy config files for slave nodes
+  become: true
+  tags: redis
+  ansible.builtin.template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: '{{ item.owner }}'
+    group: '{{ item.group }}'
+    mode: '{{ item.mode }}'
+    backup: true
+  loop:
+    - { src: 'redis_slave.conf.j2', dest: '/etc/redis/cluster/slave/redis_slave.conf', owner: 'redis', group: 'redis', mode: '0640' }
+    - { src: 'redis_slave.service.j2', dest: '/etc/systemd/system/redis_slave.service', owner: 'root', group: 'root', mode: '0640' }
+  notify:
+    - restart_redis_slave
+    - enable_redis_slave
+
+- name: Reload systemctl
+  become: true
+  tags: redis
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Flush handlers
+  tags: redis
+  ansible.builtin.meta: flush_handlers
+
+- name: Setting up and testing the cluster
+  become: true
+  tags: redis, cluster
+  when: inventory_hostname == groups['all'][0]
+  block:
+    - name: Checking the existence of a cluster
+      ansible.builtin.shell: |
+        set -o pipefail && redis-cli -c -h  {{ local_ip }} -p {{ redis_master_port }} CLUSTER NODES | grep myself | awk '{print $7}'
+      args:
+        executable: /bin/bash
+      changed_when: false
+      register: check_cluster
+
+    - name: Cluster initialization
+      ansible.builtin.shell: |
+        redis-cli -c -h {{ local_ip }} -p {{ redis_master_port }} \
+        --cluster create {{ local_ip }}:{{ redis_master_port }} \
+        {{ hostvars[groups['all'][1]]['local_ip'] }}:{{ redis_master_port }} \
+        {{ hostvars[groups['all'][2]]['local_ip'] }}:{{ redis_master_port }} \
+        {{ local_ip }}:{{ redis_slave_port }} \
+        {{ hostvars[groups['all'][1]]['local_ip'] }}:{{ redis_slave_port }} \
+        {{ hostvars[groups['all'][2]]['local_ip'] }}:{{ redis_slave_port }} \
+        --cluster-replicas 1 --cluster-yes
+      args:
+        executable: /bin/bash
+      when: check_cluster.stdout | int == 0
+      changed_when: false
+
+    - name: Checking the health of the Redis Cluster
+      ansible.builtin.shell: |
+        set -o pipefail && redis-cli -c -h  {{ local_ip }} -p {{ redis_master_port }} CLUSTER NODES | awk '{print $8}' | grep connected | wc -l
+      args:
+        executable: /bin/bash
+      changed_when: false
+      register: work_cluster
+
+    - name: The cluster is ready to work
+      ansible.builtin.debug:
+        msg: "OK"
+      when: work_cluster.stdout | int == 6
+
+    - name: Problems with the cluster
+      ansible.builtin.debug:
+        msg: "ERROR"
+      when: work_cluster.stdout | int != 6
+      failed_when: true

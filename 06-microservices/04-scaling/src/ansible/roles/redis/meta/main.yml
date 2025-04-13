@@ -1,0 +1,19 @@
+galaxy_info:
+  role_name: redis
+  namespace: cachmc
+  author: Vladislav Shishkov
+
+  description: Installation and configuration Redis Cluster
+
+  license: MIT
+
+  min_ansible_version: '2.18'
+
+  platforms:
+    - name: Ubuntu
+      version:
+        - Jammy
+
+  galaxy_tags: []
+
+dependencies: []

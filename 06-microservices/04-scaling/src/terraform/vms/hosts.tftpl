@@ -1,0 +1,14 @@
+# The function is used to permanently change the checksum of file. DON'T DELETE!
+# ${timestamp()}
+---
+all:
+  hosts:
+%{~ for i in vms ~}
+
+    ${i.name}:
+      ansible_host: ${i.network_interface.0.nat_ip_address != "" ? i.network_interface.0.nat_ip_address : i.network_interface.0.ip_address}
+      local_ip: ${i.network_interface.0.ip_address}
+%{~ endfor ~}
+
+  vars:
+    ansible_user: ubuntu

@@ -1,0 +1,10 @@
+port {{ redis_master_port }}
+dir /var/lib/redis/master/
+appendonly no
+protected-mode no
+cluster-enabled yes
+cluster-node-timeout 5000
+cluster-config-file /etc/redis/cluster/master/nodes_master.conf
+pidfile /var/run/redis/redis_master.pid
+logfile /var/log/redis/redis_master.log
+loglevel notice
